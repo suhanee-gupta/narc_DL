@@ -1,0 +1,2651 @@
+[
+  {
+    "user_id": "user_000_news_junkie",
+    "category_weights": {
+      "politics": 0.2494019844410209,
+      "sports": 0.2639249475682146,
+      "finance": 0.018684370310742063,
+      "tech": 0.018684370310742063,
+      "entertainment": 0.018684370310742063,
+      "health": 0.3932512164370541,
+      "world": 0.018684370310742063,
+      "science": 0.018684370310742063
+    },
+    "curiosity": 0.3496714153011233,
+    "patience": 0.7861735698828816,
+    "recency_bias": 0.95,
+    "position_bias": 0.5523029856408026,
+    "satiation_rate": 0.17658466252766641,
+    "session_length": 7,
+    "active_hours": [
+      7,
+      6,
+      22,
+      9,
+      19,
+      14
+    ],
+    "mood_volatility": 0.5612112374299882
+  },
+  {
+    "user_id": "user_001_casual_browser",
+    "category_weights": {
+      "politics": 0.017079183717115653,
+      "sports": 0.017079183717115653,
+      "finance": 0.017079183717115653,
+      "tech": 0.35046270821139036,
+      "entertainment": 0.017079183717115653,
+      "health": 0.2782676785987911,
+      "world": 0.2858736946042402,
+      "science": 0.017079183717115653
+    },
+    "curiosity": 0.576586304305082,
+    "patience": 0.45792128155073913,
+    "recency_bias": 0.4767434729152909,
+    "position_bias": 0.7530525614065048,
+    "satiation_rate": 0.5542560043585965,
+    "session_length": 13,
+    "active_hours": [
+      11,
+      19,
+      22
+    ],
+    "mood_volatility": 0.36672280500298515
+  },
+  {
+    "user_id": "user_002_deep_reader",
+    "category_weights": {
+      "politics": 0.05395735620743373,
+      "sports": 0.05395735620743373,
+      "finance": 0.05395735620743373,
+      "tech": 0.05395735620743373,
+      "entertainment": 0.05395735620743373,
+      "health": 0.6222985065479639,
+      "world": 0.05395735620743373,
+      "science": 0.05395735620743373
+    },
+    "curiosity": 0.15365823071875379,
+    "patience": 0.8534270246429744,
+    "recency_bias": 0.3241962271566034,
+    "position_bias": 0.05,
+    "satiation_rate": 0.05,
+    "session_length": 17,
+    "active_hours": [
+      17,
+      22,
+      15
+    ],
+    "mood_volatility": 0.3587125203332079
+  },
+  {
+    "user_id": "user_003_explorer",
+    "category_weights": {
+      "politics": 0.03993064626246417,
+      "sports": 0.03993064626246417,
+      "finance": 0.03993064626246417,
+      "tech": 0.03993064626246417,
+      "entertainment": 0.03993064626246417,
+      "health": 0.03993064626246417,
+      "world": 0.03993064626246417,
+      "science": 0.7204854761627508
+    },
+    "curiosity": 0.8437712470759028,
+    "patience": 0.39871688796655763,
+    "recency_bias": 0.5314247332595274,
+    "position_bias": 0.4091975924478789,
+    "satiation_rate": 0.5587696298664708,
+    "session_length": 17,
+    "active_hours": [
+      15,
+      17,
+      22
+    ],
+    "mood_volatility": 0.31537315415399597
+  },
+  {
+    "user_id": "user_004_sports_fan",
+    "category_weights": {
+      "politics": 0.7399601374646946,
+      "sports": 0.03714855179075791,
+      "finance": 0.03714855179075791,
+      "tech": 0.03714855179075791,
+      "entertainment": 0.03714855179075791,
+      "health": 0.03714855179075791,
+      "world": 0.03714855179075791,
+      "science": 0.03714855179075791
+    },
+    "curiosity": 0.24656487689215542,
+    "patience": 0.5774223699513464,
+    "recency_bias": 0.7067528204687923,
+    "position_bias": 0.4575251813786543,
+    "satiation_rate": 0.24556172754748173,
+    "session_length": 14,
+    "active_hours": [
+      13,
+      9,
+      12
+    ],
+    "mood_volatility": 0.36678416186605534
+  },
+  {
+    "user_id": "user_005_news_junkie",
+    "category_weights": {
+      "politics": 0.01641793688724299,
+      "sports": 0.3292227746173804,
+      "finance": 0.3370159930606436,
+      "tech": 0.01641793688724299,
+      "entertainment": 0.01641793688724299,
+      "health": 0.25167154788576096,
+      "world": 0.01641793688724299,
+      "science": 0.01641793688724299
+    },
+    "curiosity": 0.3110922589709866,
+    "patience": 0.6849006422577697,
+    "recency_bias": 0.9375698018345672,
+    "position_bias": 0.33993613100811954,
+    "satiation_rate": 0.17083062502067234,
+    "session_length": 7,
+    "active_hours": [
+      13,
+      11,
+      22,
+      12
+    ],
+    "mood_volatility": 0.3619686960705668
+  },
+  {
+    "user_id": "user_006_casual_browser",
+    "category_weights": {
+      "politics": 0.015944259238206342,
+      "sports": 0.015944259238206342,
+      "finance": 0.21422261994316877,
+      "tech": 0.3610223351059583,
+      "entertainment": 0.015944259238206342,
+      "health": 0.3450337487598412,
+      "world": 0.015944259238206342,
+      "science": 0.015944259238206342
+    },
+    "curiosity": 0.5398293387770603,
+    "patience": 0.4852278184508938,
+    "recency_bias": 0.39865027752620663,
+    "position_bias": 0.69422890710441,
+    "satiation_rate": 0.5822544912103189,
+    "session_length": 6,
+    "active_hours": [
+      18,
+      14,
+      7,
+      9,
+      15
+    ],
+    "mood_volatility": 0.7258205758836014
+  },
+  {
+    "user_id": "user_007_deep_reader",
+    "category_weights": {
+      "politics": 0.021386386993776294,
+      "sports": 0.021386386993776294,
+      "finance": 0.021386386993776294,
+      "tech": 0.37401516366114584,
+      "entertainment": 0.021386386993776294,
+      "health": 0.49766651437619636,
+      "world": 0.021386386993776294,
+      "science": 0.021386386993776294
+    },
+    "curiosity": 0.07791563500289778,
+    "patience": 0.9208863595004756,
+    "recency_bias": 0.10403298761202243,
+    "position_bias": 0.06718139511015694,
+    "satiation_rate": 0.11968612358691236,
+    "session_length": 19,
+    "active_hours": [
+      14,
+      10,
+      9,
+      17
+    ],
+    "mood_volatility": 0.5368208804978905
+  },
+  {
+    "user_id": "user_008_explorer",
+    "category_weights": {
+      "politics": 0.028344013244341028,
+      "sports": 0.028344013244341028,
+      "finance": 0.028344013244341028,
+      "tech": 0.028344013244341028,
+      "entertainment": 0.37668658997810484,
+      "health": 0.028344013244341028,
+      "world": 0.45324933055584904,
+      "science": 0.028344013244341028
+    },
+    "curiosity": 0.95,
+    "patience": 0.5171368281189971,
+    "recency_bias": 0.48843517176117596,
+    "position_bias": 0.4698896304410711,
+    "satiation_rate": 0.5521478009632572,
+    "session_length": 9,
+    "active_hours": [
+      8,
+      7,
+      19,
+      21,
+      22,
+      16
+    ],
+    "mood_volatility": 0.29598920103347015
+  },
+  {
+    "user_id": "user_009_sports_fan",
+    "category_weights": {
+      "politics": 0.30002772739951367,
+      "sports": 0.017627176068628143,
+      "finance": 0.017627176068628143,
+      "tech": 0.017627176068628143,
+      "entertainment": 0.3338292143459771,
+      "health": 0.017627176068628143,
+      "world": 0.2780071779113684,
+      "science": 0.017627176068628143
+    },
+    "curiosity": 0.05,
+    "patience": 0.5539361229040212,
+    "recency_bias": 0.8057122226218916,
+    "position_bias": 0.6343618289568461,
+    "satiation_rate": 0.1236959844637266,
+    "session_length": 13,
+    "active_hours": [
+      9,
+      14,
+      18
+    ],
+    "mood_volatility": 0.5845770791478849
+  },
+  {
+    "user_id": "user_010_news_junkie",
+    "category_weights": {
+      "politics": 0.04251433382237083,
+      "sports": 0.04251433382237083,
+      "finance": 0.04251433382237083,
+      "tech": 0.04251433382237083,
+      "entertainment": 0.7023996632434042,
+      "health": 0.04251433382237083,
+      "world": 0.04251433382237083,
+      "science": 0.04251433382237083
+    },
+    "curiosity": 0.3324083969394795,
+    "patience": 0.7614917719583684,
+    "recency_bias": 0.8323077999694042,
+    "position_bias": 0.4611676288840868,
+    "satiation_rate": 0.30309995224959513,
+    "session_length": 19,
+    "active_hours": [
+      14,
+      11,
+      22
+    ],
+    "mood_volatility": 0.7475767036068923
+  },
+  {
+    "user_id": "user_011_casual_browser",
+    "category_weights": {
+      "politics": 0.01952845897700394,
+      "sports": 0.01952845897700394,
+      "finance": 0.01952845897700394,
+      "tech": 0.01952845897700394,
+      "entertainment": 0.3439926962427568,
+      "health": 0.3048140097389354,
+      "world": 0.2535509991332881,
+      "science": 0.01952845897700394
+    },
+    "curiosity": 0.6931280119116199,
+    "patience": 0.21607824767773615,
+    "recency_bias": 0.3690787624148786,
+    "position_bias": 0.8331263431403564,
+    "satiation_rate": 0.5975545127122359,
+    "session_length": 10,
+    "active_hours": [
+      16,
+      21,
+      6
+    ],
+    "mood_volatility": 0.26712063519253704
+  },
+  {
+    "user_id": "user_012_deep_reader",
+    "category_weights": {
+      "politics": 0.024975635340209565,
+      "sports": 0.5786890670259507,
+      "finance": 0.024975635340209565,
+      "tech": 0.024975635340209565,
+      "entertainment": 0.27145712093279195,
+      "health": 0.024975635340209565,
+      "world": 0.024975635340209565,
+      "science": 0.024975635340209565
+    },
+    "curiosity": 0.152082576215471,
+    "patience": 0.8814341023336183,
+    "recency_bias": 0.18936650259939716,
+    "position_bias": 0.08037933759193293,
+    "satiation_rate": 0.1812525822394198,
+    "session_length": 7,
+    "active_hours": [
+      21,
+      8,
+      18
+    ],
+    "mood_volatility": 0.5196237017177094
+  },
+  {
+    "user_id": "user_013_explorer",
+    "category_weights": {
+      "politics": 0.03717988720194024,
+      "sports": 0.03717988720194024,
+      "finance": 0.7397407895864183,
+      "tech": 0.03717988720194024,
+      "entertainment": 0.03717988720194024,
+      "health": 0.03717988720194024,
+      "world": 0.03717988720194024,
+      "science": 0.03717988720194024
+    },
+    "curiosity": 0.95,
+    "patience": 0.49279898784196663,
+    "recency_bias": 0.6003532897892024,
+    "position_bias": 0.5361636025047634,
+    "satiation_rate": 0.6354880245394875,
+    "session_length": 10,
+    "active_hours": [
+      22,
+      19,
+      9,
+      14,
+      18
+    ],
+    "mood_volatility": 0.6379586414539857
+  },
+  {
+    "user_id": "user_014_sports_fan",
+    "category_weights": {
+      "politics": 0.04350685338452224,
+      "sports": 0.04350685338452224,
+      "finance": 0.04350685338452224,
+      "tech": 0.04350685338452224,
+      "entertainment": 0.6954520263083444,
+      "health": 0.04350685338452224,
+      "world": 0.04350685338452224,
+      "science": 0.04350685338452224
+    },
+    "curiosity": 0.1361395605508414,
+    "patience": 0.7538036566465969,
+    "recency_bias": 0.6964173960890048,
+    "position_bias": 0.7564643655814006,
+    "satiation_rate": 0.05,
+    "session_length": 16,
+    "active_hours": [
+      22,
+      20,
+      7,
+      9,
+      19,
+      21
+    ],
+    "mood_volatility": 0.4028513372884732
+  },
+  {
+    "user_id": "user_015_news_junkie",
+    "category_weights": {
+      "politics": 0.021455275605795916,
+      "sports": 0.23350004947220265,
+      "finance": 0.021455275605795916,
+      "tech": 0.21686697754189044,
+      "entertainment": 0.4423565949569273,
+      "health": 0.021455275605795916,
+      "world": 0.021455275605795916,
+      "science": 0.021455275605795916
+    },
+    "curiosity": 0.38219025043752236,
+    "patience": 0.8087047068238171,
+    "recency_bias": 0.8700992649534133,
+    "position_bias": 0.40917607765355024,
+    "satiation_rate": 0.05,
+    "session_length": 7,
+    "active_hours": [
+      16,
+      8,
+      14
+    ],
+    "mood_volatility": 0.34280278062139713
+  },
+  {
+    "user_id": "user_016_casual_browser",
+    "category_weights": {
+      "politics": 0.016783300045436454,
+      "sports": 0.40334824340102493,
+      "finance": 0.016783300045436454,
+      "tech": 0.016783300045436454,
+      "entertainment": 0.31159281406665085,
+      "health": 0.016783300045436454,
+      "world": 0.016783300045436454,
+      "science": 0.20114244230514197
+    },
+    "curiosity": 0.5780328112162488,
+    "patience": 0.3357112571511746,
+    "recency_bias": 0.5477894044741516,
+    "position_bias": 0.7481729781726353,
+    "satiation_rate": 0.4191506397106812,
+    "session_length": 20,
+    "active_hours": [
+      21,
+      19,
+      9,
+      7
+    ],
+    "mood_volatility": 0.258158488537294
+  },
+  {
+    "user_id": "user_017_deep_reader",
+    "category_weights": {
+      "politics": 0.02216111400115045,
+      "sports": 0.02216111400115045,
+      "finance": 0.02216111400115045,
+      "tech": 0.5087649098965329,
+      "entertainment": 0.02216111400115045,
+      "health": 0.35826840609656446,
+      "world": 0.02216111400115045,
+      "science": 0.02216111400115045
+    },
+    "curiosity": 0.14982429564154637,
+    "patience": 0.95,
+    "recency_bias": 0.33287511096596845,
+    "position_bias": 0.14702397962329614,
+    "satiation_rate": 0.1513267433113356,
+    "session_length": 6,
+    "active_hours": [
+      7,
+      18,
+      17
+    ],
+    "mood_volatility": 0.4035815632369779
+  },
+  {
+    "user_id": "user_018_explorer",
+    "category_weights": {
+      "politics": 0.05031737411474481,
+      "sports": 0.05031737411474481,
+      "finance": 0.05031737411474481,
+      "tech": 0.6477783811967863,
+      "entertainment": 0.05031737411474481,
+      "health": 0.05031737411474481,
+      "world": 0.05031737411474481,
+      "science": 0.05031737411474481
+    },
+    "curiosity": 0.909707754934804,
+    "patience": 0.596864499053289,
+    "recency_bias": 0.4297946906122648,
+    "position_bias": 0.4672337853402232,
+    "satiation_rate": 0.6607891846867842,
+    "session_length": 19,
+    "active_hours": [
+      19,
+      11,
+      10,
+      13
+    ],
+    "mood_volatility": 0.34988386872926036
+  },
+  {
+    "user_id": "user_019_sports_fan",
+    "category_weights": {
+      "politics": 0.03434026585336512,
+      "sports": 0.03434026585336512,
+      "finance": 0.03434026585336512,
+      "tech": 0.03434026585336512,
+      "entertainment": 0.03434026585336512,
+      "health": 0.03434026585336512,
+      "world": 0.03434026585336512,
+      "science": 0.7596181390264442
+    },
+    "curiosity": 0.05,
+    "patience": 0.6296120277064576,
+    "recency_bias": 0.7261055272179889,
+    "position_bias": 0.600511345664246,
+    "satiation_rate": 0.2765412866624853,
+    "session_length": 8,
+    "active_hours": [
+      6,
+      8,
+      20
+    ],
+    "mood_volatility": 0.6521393024118054
+  },
+  {
+    "user_id": "user_020_news_junkie",
+    "category_weights": {
+      "politics": 0.04329714539148851,
+      "sports": 0.04329714539148851,
+      "finance": 0.6969199822595804,
+      "tech": 0.04329714539148851,
+      "entertainment": 0.04329714539148851,
+      "health": 0.04329714539148851,
+      "world": 0.04329714539148851,
+      "science": 0.04329714539148851
+    },
+    "curiosity": 0.15846292579495855,
+    "patience": 0.7579354677234641,
+    "recency_bias": 0.865728548347323,
+    "position_bias": 0.3197722730778381,
+    "satiation_rate": 0.1838714288333991,
+    "session_length": 20,
+    "active_hours": [
+      18,
+      7,
+      8,
+      12
+    ],
+    "mood_volatility": 0.20129322701085586
+  },
+  {
+    "user_id": "user_021_casual_browser",
+    "category_weights": {
+      "politics": 0.023778001660269065,
+      "sports": 0.023778001660269065,
+      "finance": 0.023778001660269065,
+      "tech": 0.023778001660269065,
+      "entertainment": 0.5178121238433397,
+      "health": 0.023778001660269065,
+      "world": 0.3395198661950458,
+      "science": 0.023778001660269065
+    },
+    "curiosity": 0.6404050856814538,
+    "patience": 0.488618590121053,
+    "recency_bias": 0.4174577812831839,
+    "position_bias": 0.8257550390722764,
+    "satiation_rate": 0.4925554084233833,
+    "session_length": 20,
+    "active_hours": [
+      12,
+      15,
+      9,
+      6
+    ],
+    "mood_volatility": 0.5475081744897539
+  },
+  {
+    "user_id": "user_022_deep_reader",
+    "category_weights": {
+      "politics": 0.20814562366934028,
+      "sports": 0.019170713742548036,
+      "finance": 0.3363071486196903,
+      "tech": 0.019170713742548036,
+      "entertainment": 0.019170713742548036,
+      "health": 0.3596936589982292,
+      "world": 0.019170713742548036,
+      "science": 0.019170713742548036
+    },
+    "curiosity": 0.05,
+    "patience": 0.8973486124550784,
+    "recency_bias": 0.3060230209941026,
+    "position_bias": 0.4463242112485286,
+    "satiation_rate": 0.08076390352188775,
+    "session_length": 10,
+    "active_hours": [
+      22,
+      8,
+      19
+    ],
+    "mood_volatility": 0.31149497658843395
+  },
+  {
+    "user_id": "user_023_explorer",
+    "category_weights": {
+      "politics": 0.015692254469759984,
+      "sports": 0.25196477519691046,
+      "finance": 0.015692254469759984,
+      "tech": 0.015692254469759984,
+      "entertainment": 0.015692254469759984,
+      "health": 0.3785590352408904,
+      "world": 0.015692254469759984,
+      "science": 0.2910149172133991
+    },
+    "curiosity": 0.9301547342333613,
+    "patience": 0.49652882302947565,
+    "recency_bias": 0.3831321962380468,
+    "position_bias": 0.6142822814515021,
+    "satiation_rate": 0.7751933032686774,
+    "session_length": 6,
+    "active_hours": [
+      19,
+      16,
+      20
+    ],
+    "mood_volatility": 0.35645941736217973
+  },
+  {
+    "user_id": "user_024_sports_fan",
+    "category_weights": {
+      "politics": 0.018014091516270325,
+      "sports": 0.3616392523674774,
+      "finance": 0.2612035379143346,
+      "tech": 0.018014091516270325,
+      "entertainment": 0.018014091516270325,
+      "health": 0.2870867521368363,
+      "world": 0.018014091516270325,
+      "science": 0.018014091516270325
+    },
+    "curiosity": 0.1791031947043047,
+    "patience": 0.5090612545205261,
+    "recency_bias": 0.8402794310936099,
+    "position_bias": 0.4598148937207719,
+    "satiation_rate": 0.35868570938002703,
+    "session_length": 15,
+    "active_hours": [
+      6,
+      20,
+      15
+    ],
+    "mood_volatility": 0.7990726645126656
+  },
+  {
+    "user_id": "user_025_news_junkie",
+    "category_weights": {
+      "politics": 0.03989704000449712,
+      "sports": 0.7207207199685202,
+      "finance": 0.03989704000449712,
+      "tech": 0.03989704000449712,
+      "entertainment": 0.03989704000449712,
+      "health": 0.03989704000449712,
+      "world": 0.03989704000449712,
+      "science": 0.03989704000449712
+    },
+    "curiosity": 0.5190455625809979,
+    "patience": 0.7009463674869312,
+    "recency_bias": 0.8433702270397229,
+    "position_bias": 0.40996513650876415,
+    "satiation_rate": 0.1496524345883801,
+    "session_length": 13,
+    "active_hours": [
+      17,
+      8,
+      20,
+      9
+    ],
+    "mood_volatility": 0.4217162532433304
+  },
+  {
+    "user_id": "user_026_casual_browser",
+    "category_weights": {
+      "politics": 0.033891211689067745,
+      "sports": 0.033891211689067745,
+      "finance": 0.033891211689067745,
+      "tech": 0.033891211689067745,
+      "entertainment": 0.033891211689067745,
+      "health": 0.033891211689067745,
+      "world": 0.033891211689067745,
+      "science": 0.7627615181765257
+    },
+    "curiosity": 0.4449336568933867,
+    "patience": 0.3068562974806027,
+    "recency_bias": 0.29376962862738953,
+    "position_bias": 0.8473592430635182,
+    "satiation_rate": 0.4080575765766197,
+    "session_length": 14,
+    "active_hours": [
+      15,
+      9,
+      20
+    ],
+    "mood_volatility": 0.28057466863602065
+  },
+  {
+    "user_id": "user_027_deep_reader",
+    "category_weights": {
+      "politics": 0.03554133869187905,
+      "sports": 0.7512106291568467,
+      "finance": 0.03554133869187905,
+      "tech": 0.03554133869187905,
+      "entertainment": 0.03554133869187905,
+      "health": 0.03554133869187905,
+      "world": 0.03554133869187905,
+      "science": 0.03554133869187905
+    },
+    "curiosity": 0.35499344050175397,
+    "patience": 0.8216746707663763,
+    "recency_bias": 0.26779384837943243,
+    "position_bias": 0.281351721736967,
+    "satiation_rate": 0.05,
+    "session_length": 9,
+    "active_hours": [
+      15,
+      12,
+      17,
+      11,
+      9
+    ],
+    "mood_volatility": 0.6124982772807983
+  },
+  {
+    "user_id": "user_028_explorer",
+    "category_weights": {
+      "politics": 0.019130846221509103,
+      "sports": 0.019130846221509103,
+      "finance": 0.43410866261246667,
+      "tech": 0.019130846221509103,
+      "entertainment": 0.019130846221509103,
+      "health": 0.019130846221509103,
+      "world": 0.019130846221509103,
+      "science": 0.45110626005847876
+    },
+    "curiosity": 0.922745993460413,
+    "patience": 0.6307142754282429,
+    "recency_bias": 0.3392516765438772,
+    "position_bias": 0.5184633858532304,
+    "satiation_rate": 0.7259882794248423,
+    "session_length": 7,
+    "active_hours": [
+      14,
+      7,
+      6,
+      11,
+      18,
+      8
+    ],
+    "mood_volatility": 0.5822680263808279
+  },
+  {
+    "user_id": "user_029_sports_fan",
+    "category_weights": {
+      "politics": 0.02314142835983376,
+      "sports": 0.02314142835983376,
+      "finance": 0.3847848562667129,
+      "tech": 0.02314142835983376,
+      "entertainment": 0.02314142835983376,
+      "health": 0.4763665735742845,
+      "world": 0.02314142835983376,
+      "science": 0.02314142835983376
+    },
+    "curiosity": 0.17818228717773105,
+    "patience": 0.4763049289121918,
+    "recency_bias": 0.5679543386915723,
+    "position_bias": 0.6521941565616898,
+    "satiation_rate": 0.3296984673233186,
+    "session_length": 5,
+    "active_hours": [
+      8,
+      10,
+      14
+    ],
+    "mood_volatility": 0.22161688283649839
+  },
+  {
+    "user_id": "user_030_news_junkie",
+    "category_weights": {
+      "politics": 0.030735603146145183,
+      "sports": 0.030735603146145183,
+      "finance": 0.366112755012605,
+      "tech": 0.44947362611052394,
+      "entertainment": 0.030735603146145183,
+      "health": 0.030735603146145183,
+      "world": 0.030735603146145183,
+      "science": 0.030735603146145183
+    },
+    "curiosity": 0.32504928503458763,
+    "patience": 0.8346448209496976,
+    "recency_bias": 0.831997527842151,
+    "position_bias": 0.42322536971610036,
+    "satiation_rate": 0.22930724732986812,
+    "session_length": 6,
+    "active_hours": [
+      12,
+      13,
+      16,
+      7,
+      11
+    ],
+    "mood_volatility": 0.6680697451228657
+  },
+  {
+    "user_id": "user_031_casual_browser",
+    "category_weights": {
+      "politics": 0.018652479264601826,
+      "sports": 0.45965473445437816,
+      "finance": 0.4284303899580108,
+      "tech": 0.018652479264601826,
+      "entertainment": 0.018652479264601826,
+      "health": 0.018652479264601826,
+      "world": 0.018652479264601826,
+      "science": 0.018652479264601826
+    },
+    "curiosity": 0.5285648581973632,
+    "patience": 0.48657745111447565,
+    "recency_bias": 0.4473832920911788,
+    "position_bias": 0.6808696502797351,
+    "satiation_rate": 0.565655360863383,
+    "session_length": 10,
+    "active_hours": [
+      6,
+      11,
+      17,
+      21,
+      18,
+      12
+    ],
+    "mood_volatility": 0.6813410833622835
+  },
+  {
+    "user_id": "user_032_deep_reader",
+    "category_weights": {
+      "politics": 0.01625631559696522,
+      "sports": 0.3752364331113209,
+      "finance": 0.18892170523152396,
+      "tech": 0.3545602836723291,
+      "entertainment": 0.01625631559696522,
+      "health": 0.01625631559696522,
+      "world": 0.01625631559696522,
+      "science": 0.01625631559696522
+    },
+    "curiosity": 0.10253183297726787,
+    "patience": 0.95,
+    "recency_bias": 0.4158595579007404,
+    "position_bias": 0.11793176816482896,
+    "satiation_rate": 0.1963376129244322,
+    "session_length": 20,
+    "active_hours": [
+      12,
+      20,
+      11,
+      10
+    ],
+    "mood_volatility": 0.6923218285829373
+  },
+  {
+    "user_id": "user_033_explorer",
+    "category_weights": {
+      "politics": 0.05762039349471101,
+      "sports": 0.05762039349471101,
+      "finance": 0.05762039349471101,
+      "tech": 0.596657245537023,
+      "entertainment": 0.05762039349471101,
+      "health": 0.05762039349471101,
+      "world": 0.05762039349471101,
+      "science": 0.05762039349471101
+    },
+    "curiosity": 0.9412780926936498,
+    "patience": 0.582206015999449,
+    "recency_bias": 0.6896792982653948,
+    "position_bias": 0.47546118839971296,
+    "satiation_rate": 0.6246263835642509,
+    "session_length": 11,
+    "active_hours": [
+      16,
+      14,
+      19,
+      7,
+      18,
+      10
+    ],
+    "mood_volatility": 0.4106876774496514
+  },
+  {
+    "user_id": "user_034_sports_fan",
+    "category_weights": {
+      "politics": 0.018678729361920655,
+      "sports": 0.018678729361920655,
+      "finance": 0.018678729361920655,
+      "tech": 0.018678729361920655,
+      "entertainment": 0.43251674056663664,
+      "health": 0.19452043750536455,
+      "world": 0.2795691751183956,
+      "science": 0.018678729361920655
+    },
+    "curiosity": 0.05,
+    "patience": 0.5184189715034562,
+    "recency_bias": 0.6922898290585895,
+    "position_bias": 0.6341151974816643,
+    "satiation_rate": 0.32766907993300187,
+    "session_length": 13,
+    "active_hours": [
+      14,
+      7,
+      21,
+      15
+    ],
+    "mood_volatility": 0.46073825513878663
+  },
+  {
+    "user_id": "user_035_news_junkie",
+    "category_weights": {
+      "politics": 0.015386794274498827,
+      "sports": 0.015386794274498827,
+      "finance": 0.015386794274498827,
+      "tech": 0.18055921105857473,
+      "entertainment": 0.3614753568586279,
+      "health": 0.3810314607103032,
+      "world": 0.015386794274498827,
+      "science": 0.015386794274498827
+    },
+    "curiosity": 0.38271832490360236,
+    "patience": 0.8013001891877908,
+    "recency_bias": 0.95,
+    "position_bias": 0.3735343166762044,
+    "satiation_rate": 0.4720169166589619,
+    "session_length": 11,
+    "active_hours": [
+      7,
+      19,
+      6,
+      14,
+      18
+    ],
+    "mood_volatility": 0.5230711982556753
+  },
+  {
+    "user_id": "user_036_casual_browser",
+    "category_weights": {
+      "politics": 0.01962085715890066,
+      "sports": 0.01962085715890066,
+      "finance": 0.3917022626170507,
+      "tech": 0.216802763883605,
+      "entertainment": 0.01962085715890066,
+      "health": 0.01962085715890066,
+      "world": 0.01962085715890066,
+      "science": 0.2933906877048411
+    },
+    "curiosity": 0.6625667347765006,
+    "patience": 0.21428424435837173,
+    "recency_bias": 0.2929107501938888,
+    "position_bias": 0.8482472415243185,
+    "satiation_rate": 0.4776537214674149,
+    "session_length": 15,
+    "active_hours": [
+      15,
+      22,
+      16
+    ],
+    "mood_volatility": 0.44503574517153016
+  },
+  {
+    "user_id": "user_037_deep_reader",
+    "category_weights": {
+      "politics": 0.029226082812332226,
+      "sports": 0.029226082812332226,
+      "finance": 0.029226082812332226,
+      "tech": 0.029226082812332226,
+      "entertainment": 0.34806268446785704,
+      "health": 0.029226082812332226,
+      "world": 0.029226082812332226,
+      "science": 0.47658081865814966
+    },
+    "curiosity": 0.2714000494092092,
+    "patience": 0.9473237624573545,
+    "recency_bias": 0.2927171087343127,
+    "position_bias": 0.11532062819315951,
+    "satiation_rate": 0.05,
+    "session_length": 17,
+    "active_hours": [
+      15,
+      18,
+      14,
+      19
+    ],
+    "mood_volatility": 0.20024356381837252
+  },
+  {
+    "user_id": "user_038_explorer",
+    "category_weights": {
+      "politics": 0.021328189101813496,
+      "sports": 0.021328189101813496,
+      "finance": 0.021328189101813496,
+      "tech": 0.4646640839310511,
+      "entertainment": 0.021328189101813496,
+      "health": 0.021328189101813496,
+      "world": 0.021328189101813496,
+      "science": 0.407366781458068
+    },
+    "curiosity": 0.8553485047932979,
+    "patience": 0.5856398794323472,
+    "recency_bias": 0.5214093744130204,
+    "position_bias": 0.3754261221288012,
+    "satiation_rate": 0.7173180925851181,
+    "session_length": 15,
+    "active_hours": [
+      20,
+      22,
+      16,
+      9,
+      14,
+      13
+    ],
+    "mood_volatility": 0.6762412394636013
+  },
+  {
+    "user_id": "user_039_sports_fan",
+    "category_weights": {
+      "politics": 0.32970517839266567,
+      "sports": 0.017092989849182796,
+      "finance": 0.24369127059005638,
+      "tech": 0.017092989849182796,
+      "entertainment": 0.017092989849182796,
+      "health": 0.3411386017713639,
+      "world": 0.017092989849182796,
+      "science": 0.017092989849182796
+    },
+    "curiosity": 0.13853173797288368,
+    "patience": 0.5116142563798867,
+    "recency_bias": 0.7153725105945528,
+    "position_bias": 0.6058208718446,
+    "satiation_rate": 0.18570297021693766,
+    "session_length": 7,
+    "active_hours": [
+      15,
+      13,
+      18,
+      9
+    ],
+    "mood_volatility": 0.2884123773474636
+  },
+  {
+    "user_id": "user_040_news_junkie",
+    "category_weights": {
+      "politics": 0.03148709750798463,
+      "sports": 0.03148709750798463,
+      "finance": 0.03148709750798463,
+      "tech": 0.7795903174441076,
+      "entertainment": 0.03148709750798463,
+      "health": 0.03148709750798463,
+      "world": 0.03148709750798463,
+      "science": 0.03148709750798463
+    },
+    "curiosity": 0.33577873603482833,
+    "patience": 0.8560784526368235,
+    "recency_bias": 0.95,
+    "position_bias": 0.5053802052034904,
+    "satiation_rate": 0.062233063204290895,
+    "session_length": 7,
+    "active_hours": [
+      19,
+      12,
+      17,
+      20,
+      21,
+      13
+    ],
+    "mood_volatility": 0.4397917177259226
+  },
+  {
+    "user_id": "user_041_casual_browser",
+    "category_weights": {
+      "politics": 0.769660295017215,
+      "sports": 0.032905672140397864,
+      "finance": 0.032905672140397864,
+      "tech": 0.032905672140397864,
+      "entertainment": 0.032905672140397864,
+      "health": 0.032905672140397864,
+      "world": 0.032905672140397864,
+      "science": 0.032905672140397864
+    },
+    "curiosity": 0.5062174960084878,
+    "patience": 0.351503526720866,
+    "recency_bias": 0.4513785950912209,
+    "position_bias": 0.8515047686306049,
+    "satiation_rate": 0.8852731490654722,
+    "session_length": 8,
+    "active_hours": [
+      13,
+      11,
+      18,
+      17,
+      14,
+      22
+    ],
+    "mood_volatility": 0.23013103108438457
+  },
+  {
+    "user_id": "user_042_deep_reader",
+    "category_weights": {
+      "politics": 0.041934123586613886,
+      "sports": 0.7064611348937028,
+      "finance": 0.041934123586613886,
+      "tech": 0.041934123586613886,
+      "entertainment": 0.041934123586613886,
+      "health": 0.041934123586613886,
+      "world": 0.041934123586613886,
+      "science": 0.041934123586613886
+    },
+    "curiosity": 0.25708905106931673,
+    "patience": 0.95,
+    "recency_bias": 0.39540017634932023,
+    "position_bias": 0.2651391251305798,
+    "satiation_rate": 0.06847307553596543,
+    "session_length": 19,
+    "active_hours": [
+      20,
+      19,
+      21,
+      14,
+      13
+    ],
+    "mood_volatility": 0.7383248619399574
+  },
+  {
+    "user_id": "user_043_explorer",
+    "category_weights": {
+      "politics": 0.01586438730525888,
+      "sports": 0.01586438730525888,
+      "finance": 0.22463449370576105,
+      "tech": 0.3585025250931503,
+      "entertainment": 0.01586438730525888,
+      "health": 0.01586438730525888,
+      "world": 0.01586438730525888,
+      "science": 0.3375410446747943
+    },
+    "curiosity": 0.95,
+    "patience": 0.4227174785462428,
+    "recency_bias": 0.4763181393259991,
+    "position_bias": 0.45146364521708965,
+    "satiation_rate": 0.7081874139386322,
+    "session_length": 20,
+    "active_hours": [
+      14,
+      20,
+      7,
+      17
+    ],
+    "mood_volatility": 0.3714368905178915
+  },
+  {
+    "user_id": "user_044_sports_fan",
+    "category_weights": {
+      "politics": 0.02462807460185401,
+      "sports": 0.02462807460185401,
+      "finance": 0.2760478344790758,
+      "tech": 0.02462807460185401,
+      "entertainment": 0.02462807460185401,
+      "health": 0.5761837179098,
+      "world": 0.02462807460185401,
+      "science": 0.02462807460185401
+    },
+    "curiosity": 0.33146585666735084,
+    "patience": 0.41327348074082515,
+    "recency_bias": 0.7686260190374513,
+    "position_bias": 0.4387284128810348,
+    "satiation_rate": 0.25280681342105665,
+    "session_length": 9,
+    "active_hours": [
+      18,
+      10,
+      17,
+      9
+    ],
+    "mood_volatility": 0.23853731042832688
+  },
+  {
+    "user_id": "user_045_news_junkie",
+    "category_weights": {
+      "politics": 0.02947865506106771,
+      "sports": 0.02947865506106771,
+      "finance": 0.02947865506106771,
+      "tech": 0.02947865506106771,
+      "entertainment": 0.3223191916770639,
+      "health": 0.5008088779565297,
+      "world": 0.02947865506106771,
+      "science": 0.02947865506106771
+    },
+    "curiosity": 0.4088950596967366,
+    "patience": 0.8064280019095463,
+    "recency_bias": 0.7922255222070694,
+    "position_bias": 0.3284696290740032,
+    "satiation_rate": 0.2679597748934676,
+    "session_length": 18,
+    "active_hours": [
+      6,
+      18,
+      13,
+      22,
+      11,
+      10
+    ],
+    "mood_volatility": 0.6520850750356315
+  },
+  {
+    "user_id": "user_046_casual_browser",
+    "category_weights": {
+      "politics": 0.027910457767618253,
+      "sports": 0.027910457767618253,
+      "finance": 0.027910457767618253,
+      "tech": 0.37096695167223287,
+      "entertainment": 0.027910457767618253,
+      "health": 0.027910457767618253,
+      "world": 0.027910457767618253,
+      "science": 0.46157030172205754
+    },
+    "curiosity": 0.5269633368282863,
+    "patience": 0.3216458589581975,
+    "recency_bias": 0.4045571839903814,
+    "position_bias": 0.7348399652394183,
+    "satiation_rate": 0.7143944089325326,
+    "session_length": 5,
+    "active_hours": [
+      16,
+      18,
+      17,
+      8,
+      13,
+      19
+    ],
+    "mood_volatility": 0.7884331865113541
+  },
+  {
+    "user_id": "user_047_deep_reader",
+    "category_weights": {
+      "politics": 0.3450685566132226,
+      "sports": 0.018686819223964268,
+      "finance": 0.018686819223964268,
+      "tech": 0.1944649578480565,
+      "entertainment": 0.36703238941889954,
+      "health": 0.018686819223964268,
+      "world": 0.018686819223964268,
+      "science": 0.018686819223964268
+    },
+    "curiosity": 0.26339190223180114,
+    "patience": 0.6974857413342392,
+    "recency_bias": 0.31864543147694274,
+    "position_bias": 0.1338213535231612,
+    "satiation_rate": 0.1852433334796224,
+    "session_length": 9,
+    "active_hours": [
+      11,
+      7,
+      10,
+      12,
+      22,
+      9
+    ],
+    "mood_volatility": 0.47281959500988935
+  },
+  {
+    "user_id": "user_048_explorer",
+    "category_weights": {
+      "politics": 0.02009686220101715,
+      "sports": 0.02009686220101715,
+      "finance": 0.45175463781684966,
+      "tech": 0.02009686220101715,
+      "entertainment": 0.02009686220101715,
+      "health": 0.02009686220101715,
+      "world": 0.42766418897704744,
+      "science": 0.02009686220101715
+    },
+    "curiosity": 0.82074792615673,
+    "patience": 0.4885263558533101,
+    "recency_bias": 0.5504987278980458,
+    "position_bias": 0.5865755194170121,
+    "satiation_rate": 0.5799703592944223,
+    "session_length": 13,
+    "active_hours": [
+      21,
+      6,
+      17
+    ],
+    "mood_volatility": 0.5236514287535203
+  },
+  {
+    "user_id": "user_049_sports_fan",
+    "category_weights": {
+      "politics": 0.02416126605279983,
+      "sports": 0.02416126605279983,
+      "finance": 0.02416126605279983,
+      "tech": 0.26648126109728243,
+      "entertainment": 0.02416126605279983,
+      "health": 0.5885511425859187,
+      "world": 0.02416126605279983,
+      "science": 0.02416126605279983
+    },
+    "curiosity": 0.06654987641590517,
+    "patience": 0.5525054688839044,
+    "recency_bias": 0.6346670767426288,
+    "position_bias": 0.7765454240281097,
+    "satiation_rate": 0.34049817109609554,
+    "session_length": 6,
+    "active_hours": [
+      13,
+      12,
+      19
+    ],
+    "mood_volatility": 0.2122280103921994
+  },
+  {
+    "user_id": "user_050_news_junkie",
+    "category_weights": {
+      "politics": 0.05292877506928574,
+      "sports": 0.05292877506928574,
+      "finance": 0.05292877506928574,
+      "tech": 0.6294985745149998,
+      "entertainment": 0.05292877506928574,
+      "health": 0.05292877506928574,
+      "world": 0.05292877506928574,
+      "science": 0.05292877506928574
+    },
+    "curiosity": 0.17391160456649546,
+    "patience": 0.8917861947054777,
+    "recency_bias": 0.95,
+    "position_bias": 0.5032465260551147,
+    "satiation_rate": 0.05,
+    "session_length": 8,
+    "active_hours": [
+      20,
+      14,
+      18,
+      11
+    ],
+    "mood_volatility": 0.3006734860206814
+  },
+  {
+    "user_id": "user_051_casual_browser",
+    "category_weights": {
+      "politics": 0.019425974413605423,
+      "sports": 0.4753693599345617,
+      "finance": 0.019425974413605423,
+      "tech": 0.019425974413605423,
+      "entertainment": 0.019425974413605423,
+      "health": 0.019425974413605423,
+      "world": 0.2257585973109253,
+      "science": 0.20174217068648598
+    },
+    "curiosity": 0.5515765927133749,
+    "patience": 0.4266911149186623,
+    "recency_bias": 0.3292330534381219,
+    "position_bias": 0.8443819428146229,
+    "satiation_rate": 0.5774634053429337,
+    "session_length": 14,
+    "active_hours": [
+      18,
+      12,
+      7,
+      15,
+      17,
+      16
+    ],
+    "mood_volatility": 0.3457096283222793
+  },
+  {
+    "user_id": "user_052_deep_reader",
+    "category_weights": {
+      "politics": 0.01650718920656632,
+      "sports": 0.01650718920656632,
+      "finance": 0.01650718920656632,
+      "tech": 0.01650718920656632,
+      "entertainment": 0.3137385139796882,
+      "health": 0.40867946496962654,
+      "world": 0.19504607501785373,
+      "science": 0.01650718920656632
+    },
+    "curiosity": 0.10730695284219172,
+    "patience": 0.89404746439382,
+    "recency_bias": 0.05,
+    "position_bias": 0.09756123586657102,
+    "satiation_rate": 0.07474318486068397,
+    "session_length": 6,
+    "active_hours": [
+      19,
+      17,
+      7,
+      14,
+      16
+    ],
+    "mood_volatility": 0.40473870491676994
+  },
+  {
+    "user_id": "user_053_explorer",
+    "category_weights": {
+      "politics": 0.40681553608026444,
+      "sports": 0.026360413771369984,
+      "finance": 0.026360413771369984,
+      "tech": 0.026360413771369984,
+      "entertainment": 0.026360413771369984,
+      "health": 0.026360413771369984,
+      "world": 0.026360413771369984,
+      "science": 0.4350219812915156
+    },
+    "curiosity": 0.775221681803515,
+    "patience": 0.6632411303931636,
+    "recency_bias": 0.3569858622039367,
+    "position_bias": 0.4559955513303016,
+    "satiation_rate": 0.7130740577286091,
+    "session_length": 19,
+    "active_hours": [
+      19,
+      11,
+      17,
+      14
+    ],
+    "mood_volatility": 0.7792842387428467
+  },
+  {
+    "user_id": "user_054_sports_fan",
+    "category_weights": {
+      "politics": 0.022989028623526784,
+      "sports": 0.022989028623526784,
+      "finance": 0.022989028623526784,
+      "tech": 0.48197402471340106,
+      "entertainment": 0.022989028623526784,
+      "health": 0.022989028623526784,
+      "world": 0.022989028623526784,
+      "science": 0.38009180354543826
+    },
+    "curiosity": 0.24412732890661157,
+    "patience": 0.45641378488205603,
+    "recency_bias": 0.8163163752154959,
+    "position_bias": 0.6010233061019586,
+    "satiation_rate": 0.2018491348952049,
+    "session_length": 13,
+    "active_hours": [
+      13,
+      8,
+      10,
+      22,
+      9
+    ],
+    "mood_volatility": 0.6502857690962038
+  },
+  {
+    "user_id": "user_055_news_junkie",
+    "category_weights": {
+      "politics": 0.31707470761556045,
+      "sports": 0.018313992242261063,
+      "finance": 0.2724245266627058,
+      "tech": 0.018313992242261063,
+      "entertainment": 0.018313992242261063,
+      "health": 0.018313992242261063,
+      "world": 0.31893080451042843,
+      "science": 0.018313992242261063
+    },
+    "curiosity": 0.34621034742632706,
+    "patience": 0.8199059695573471,
+    "recency_bias": 0.8399783122841206,
+    "position_bias": 0.4069802084990019,
+    "satiation_rate": 0.161468640313824,
+    "session_length": 16,
+    "active_hours": [
+      16,
+      14,
+      20,
+      15,
+      17
+    ],
+    "mood_volatility": 0.7280644071531381
+  },
+  {
+    "user_id": "user_056_casual_browser",
+    "category_weights": {
+      "politics": 0.2073767439028147,
+      "sports": 0.31845983396148536,
+      "finance": 0.01837762945337576,
+      "tech": 0.01837762945337576,
+      "entertainment": 0.38227527486882107,
+      "health": 0.01837762945337576,
+      "world": 0.01837762945337576,
+      "science": 0.01837762945337576
+    },
+    "curiosity": 0.6113517345251248,
+    "patience": 0.3662130674521047,
+    "recency_bias": 0.5586016816145353,
+    "position_bias": 0.6762184501173152,
+    "satiation_rate": 0.7133033374656267,
+    "session_length": 12,
+    "active_hours": [
+      21,
+      20,
+      18,
+      6,
+      7,
+      10
+    ],
+    "mood_volatility": 0.33295784028351816
+  },
+  {
+    "user_id": "user_057_deep_reader",
+    "category_weights": {
+      "politics": 0.01701083264561733,
+      "sports": 0.01701083264561733,
+      "finance": 0.29086665103724335,
+      "tech": 0.31849949749936723,
+      "entertainment": 0.01701083264561733,
+      "health": 0.3055796882353027,
+      "world": 0.01701083264561733,
+      "science": 0.01701083264561733
+    },
+    "curiosity": 0.05,
+    "patience": 0.8848214904964417,
+    "recency_bias": 0.35883172064845764,
+    "position_bias": 0.22809918677350327,
+    "satiation_rate": 0.05,
+    "session_length": 18,
+    "active_hours": [
+      17,
+      20,
+      10,
+      21,
+      19
+    ],
+    "mood_volatility": 0.3383228247791047
+  },
+  {
+    "user_id": "user_058_explorer",
+    "category_weights": {
+      "politics": 0.28763127574870834,
+      "sports": 0.014132511267208655,
+      "finance": 0.342899430212028,
+      "tech": 0.29880673770322036,
+      "entertainment": 0.014132511267208655,
+      "health": 0.014132511267208655,
+      "world": 0.014132511267208655,
+      "science": 0.014132511267208655
+    },
+    "curiosity": 0.8791877749642725,
+    "patience": 0.45069990653411673,
+    "recency_bias": 0.4410635243055788,
+    "position_bias": 0.5849602097021025,
+    "satiation_rate": 0.7357015485965047,
+    "session_length": 11,
+    "active_hours": [
+      21,
+      14,
+      17,
+      15
+    ],
+    "mood_volatility": 0.7859642137298342
+  },
+  {
+    "user_id": "user_059_sports_fan",
+    "category_weights": {
+      "politics": 0.3120657381883179,
+      "sports": 0.2942648532449078,
+      "finance": 0.020246633631444414,
+      "tech": 0.020246633631444414,
+      "entertainment": 0.2924362404095522,
+      "health": 0.020246633631444414,
+      "world": 0.020246633631444414,
+      "science": 0.020246633631444414
+    },
+    "curiosity": 0.05,
+    "patience": 0.6899599875433251,
+    "recency_bias": 0.7307299520876609,
+    "position_bias": 0.681286211883896,
+    "satiation_rate": 0.3629628841923612,
+    "session_length": 9,
+    "active_hours": [
+      7,
+      22,
+      14,
+      10,
+      17
+    ],
+    "mood_volatility": 0.7664537688774444
+  },
+  {
+    "user_id": "user_060_news_junkie",
+    "category_weights": {
+      "politics": 0.29761206484756547,
+      "sports": 0.01746451881798864,
+      "finance": 0.01746451881798864,
+      "tech": 0.01746451881798864,
+      "entertainment": 0.01746451881798864,
+      "health": 0.01746451881798864,
+      "world": 0.2900338223866343,
+      "science": 0.325031518675857
+    },
+    "curiosity": 0.21710049890779276,
+    "patience": 0.7439818959803031,
+    "recency_bias": 0.95,
+    "position_bias": 0.4610370265433465,
+    "satiation_rate": 0.19790984060358519,
+    "session_length": 10,
+    "active_hours": [
+      14,
+      21,
+      7
+    ],
+    "mood_volatility": 0.6932693871796582
+  },
+  {
+    "user_id": "user_061_casual_browser",
+    "category_weights": {
+      "politics": 0.45152002066312147,
+      "sports": 0.022245910349323935,
+      "finance": 0.022245910349323935,
+      "tech": 0.022245910349323935,
+      "entertainment": 0.022245910349323935,
+      "health": 0.022245910349323935,
+      "world": 0.022245910349323935,
+      "science": 0.41500451724093496
+    },
+    "curiosity": 0.6117327383308782,
+    "patience": 0.42776648957884245,
+    "recency_bias": 0.34084286111641704,
+    "position_bias": 0.8547097381170038,
+    "satiation_rate": 0.4797807347566106,
+    "session_length": 9,
+    "active_hours": [
+      15,
+      8,
+      9,
+      7
+    ],
+    "mood_volatility": 0.5348438207705771
+  },
+  {
+    "user_id": "user_062_deep_reader",
+    "category_weights": {
+      "politics": 0.02463278369775254,
+      "sports": 0.02463278369775254,
+      "finance": 0.02463278369775254,
+      "tech": 0.43941408034125806,
+      "entertainment": 0.02463278369775254,
+      "health": 0.02463278369775254,
+      "world": 0.4127892174722267,
+      "science": 0.02463278369775254
+    },
+    "curiosity": 0.178231879677278,
+    "patience": 0.95,
+    "recency_bias": 0.382541634898803,
+    "position_bias": 0.28135096360006384,
+    "satiation_rate": 0.23054788071543292,
+    "session_length": 19,
+    "active_hours": [
+      19,
+      15,
+      21,
+      20,
+      6
+    ],
+    "mood_volatility": 0.5657785473470782
+  },
+  {
+    "user_id": "user_063_explorer",
+    "category_weights": {
+      "politics": 0.02017339870662844,
+      "sports": 0.3910154486470026,
+      "finance": 0.02017339870662844,
+      "tech": 0.02017339870662844,
+      "entertainment": 0.02017339870662844,
+      "health": 0.02017339870662844,
+      "world": 0.2818161640908793,
+      "science": 0.2263013937289759
+    },
+    "curiosity": 0.902100384163276,
+    "patience": 0.5681952971294963,
+    "recency_bias": 0.4689733243406544,
+    "position_bias": 0.5324166352488442,
+    "satiation_rate": 0.6869856945632316,
+    "session_length": 12,
+    "active_hours": [
+      8,
+      11,
+      6,
+      12
+    ],
+    "mood_volatility": 0.4703022227706215
+  },
+  {
+    "user_id": "user_064_sports_fan",
+    "category_weights": {
+      "politics": 0.3445885165618578,
+      "sports": 0.016772530873483408,
+      "finance": 0.34558688597736165,
+      "tech": 0.016772530873483408,
+      "entertainment": 0.016772530873483408,
+      "health": 0.016772530873483408,
+      "world": 0.016772530873483408,
+      "science": 0.22596194309336354
+    },
+    "curiosity": 0.10969959649927183,
+    "patience": 0.6595157025436913,
+    "recency_bias": 0.6181779316766527,
+    "position_bias": 0.809238727568546,
+    "satiation_rate": 0.1993982618500298,
+    "session_length": 19,
+    "active_hours": [
+      13,
+      14,
+      18
+    ],
+    "mood_volatility": 0.674748647026977
+  },
+  {
+    "user_id": "user_065_news_junkie",
+    "category_weights": {
+      "politics": 0.3552320157261907,
+      "sports": 0.015035530113163836,
+      "finance": 0.015035530113163836,
+      "tech": 0.27317206178562387,
+      "entertainment": 0.015035530113163836,
+      "health": 0.015035530113163836,
+      "world": 0.015035530113163836,
+      "science": 0.2964182719223663
+    },
+    "curiosity": 0.17858113872122677,
+    "patience": 0.9158110873500068,
+    "recency_bias": 0.95,
+    "position_bias": 0.4624119817052155,
+    "satiation_rate": 0.262834550926428,
+    "session_length": 9,
+    "active_hours": [
+      7,
+      11,
+      18
+    ],
+    "mood_volatility": 0.3845670875685395
+  },
+  {
+    "user_id": "user_066_casual_browser",
+    "category_weights": {
+      "politics": 0.30472716617147827,
+      "sports": 0.019000763093534833,
+      "finance": 0.019000763093534833,
+      "tech": 0.2766771009909294,
+      "entertainment": 0.3235919173699181,
+      "health": 0.019000763093534833,
+      "world": 0.019000763093534833,
+      "science": 0.019000763093534833
+    },
+    "curiosity": 0.5987753227153085,
+    "patience": 0.21027456285141682,
+    "recency_bias": 0.40758045581937263,
+    "position_bias": 0.7322838288487888,
+    "satiation_rate": 0.5975119733417751,
+    "session_length": 13,
+    "active_hours": [
+      20,
+      8,
+      15,
+      6,
+      12,
+      17
+    ],
+    "mood_volatility": 0.39339295001498
+  },
+  {
+    "user_id": "user_067_deep_reader",
+    "category_weights": {
+      "politics": 0.33968216222532055,
+      "sports": 0.02528551023676314,
+      "finance": 0.02528551023676314,
+      "tech": 0.02528551023676314,
+      "entertainment": 0.02528551023676314,
+      "health": 0.02528551023676314,
+      "world": 0.02528551023676314,
+      "science": 0.5086047763541005
+    },
+    "curiosity": 0.18529426184978615,
+    "patience": 0.8174502803207488,
+    "recency_bias": 0.26786141583470063,
+    "position_bias": 0.24129314542756244,
+    "satiation_rate": 0.05,
+    "session_length": 5,
+    "active_hours": [
+      7,
+      11,
+      13,
+      14,
+      16
+    ],
+    "mood_volatility": 0.4653376426521218
+  },
+  {
+    "user_id": "user_068_explorer",
+    "category_weights": {
+      "politics": 0.02234539551730091,
+      "sports": 0.02234539551730091,
+      "finance": 0.36955429171734755,
+      "tech": 0.02234539551730091,
+      "entertainment": 0.49637333517884696,
+      "health": 0.02234539551730091,
+      "world": 0.02234539551730091,
+      "science": 0.02234539551730091
+    },
+    "curiosity": 0.8177779604433568,
+    "patience": 0.5243687211491912,
+    "recency_bias": 0.5244966571108722,
+    "position_bias": 0.44930568246288705,
+    "satiation_rate": 0.6528961694381676,
+    "session_length": 7,
+    "active_hours": [
+      17,
+      19,
+      11,
+      20,
+      16,
+      7
+    ],
+    "mood_volatility": 0.7146398566402117
+  },
+  {
+    "user_id": "user_069_sports_fan",
+    "category_weights": {
+      "politics": 0.02305699383382683,
+      "sports": 0.02305699383382683,
+      "finance": 0.02305699383382683,
+      "tech": 0.02305699383382683,
+      "entertainment": 0.02305699383382683,
+      "health": 0.45972770624036646,
+      "world": 0.40193033075667256,
+      "science": 0.02305699383382683
+    },
+    "curiosity": 0.12320499373576363,
+    "patience": 0.45519156585026754,
+    "recency_bias": 0.5592536225623445,
+    "position_bias": 0.5281555778747564,
+    "satiation_rate": 0.27865528482881524,
+    "session_length": 17,
+    "active_hours": [
+      20,
+      8,
+      11
+    ],
+    "mood_volatility": 0.3514393105653246
+  },
+  {
+    "user_id": "user_070_news_junkie",
+    "category_weights": {
+      "politics": 0.0333626270980486,
+      "sports": 0.0333626270980486,
+      "finance": 0.0333626270980486,
+      "tech": 0.0333626270980486,
+      "entertainment": 0.0333626270980486,
+      "health": 0.0333626270980486,
+      "world": 0.7664616103136599,
+      "science": 0.0333626270980486
+    },
+    "curiosity": 0.33109075655980047,
+    "patience": 0.9475356216949553,
+    "recency_bias": 0.95,
+    "position_bias": 0.3840061470036573,
+    "satiation_rate": 0.19809837920973114,
+    "session_length": 5,
+    "active_hours": [
+      19,
+      7,
+      9,
+      14,
+      11,
+      15
+    ],
+    "mood_volatility": 0.6538658924333443
+  },
+  {
+    "user_id": "user_071_casual_browser",
+    "category_weights": {
+      "politics": 0.3972160531774338,
+      "sports": 0.01660943068639273,
+      "finance": 0.01660943068639273,
+      "tech": 0.01660943068639273,
+      "entertainment": 0.01660943068639273,
+      "health": 0.01660943068639273,
+      "world": 0.302927689768829,
+      "science": 0.21680910362177355
+    },
+    "curiosity": 0.4997470635362191,
+    "patience": 0.298148686400761,
+    "recency_bias": 0.3711341361079862,
+    "position_bias": 0.832271856033809,
+    "satiation_rate": 0.4172769056447677,
+    "session_length": 19,
+    "active_hours": [
+      9,
+      6,
+      16,
+      15,
+      18,
+      22
+    ],
+    "mood_volatility": 0.6258696950601556
+  },
+  {
+    "user_id": "user_072_deep_reader",
+    "category_weights": {
+      "politics": 0.45420378029221475,
+      "sports": 0.028176657339195686,
+      "finance": 0.028176657339195686,
+      "tech": 0.028176657339195686,
+      "entertainment": 0.3767362756726111,
+      "health": 0.028176657339195686,
+      "world": 0.028176657339195686,
+      "science": 0.028176657339195686
+    },
+    "curiosity": 0.25193465142411725,
+    "patience": 0.95,
+    "recency_bias": 0.28912398515431426,
+    "position_bias": 0.24017117220989415,
+    "satiation_rate": 0.16901439917111127,
+    "session_length": 8,
+    "active_hours": [
+      9,
+      10,
+      13,
+      17,
+      21,
+      14
+    ],
+    "mood_volatility": 0.6232469779555123
+  },
+  {
+    "user_id": "user_073_explorer",
+    "category_weights": {
+      "politics": 0.026367873139452967,
+      "sports": 0.026367873139452967,
+      "finance": 0.026367873139452967,
+      "tech": 0.48171404559545483,
+      "entertainment": 0.026367873139452967,
+      "health": 0.026367873139452967,
+      "world": 0.026367873139452967,
+      "science": 0.36007871556782733
+    },
+    "curiosity": 0.8598779528114164,
+    "patience": 0.5224092481810417,
+    "recency_bias": 0.5012592400781795,
+    "position_bias": 0.5097676098548831,
+    "satiation_rate": 0.6226990216144533,
+    "session_length": 17,
+    "active_hours": [
+      22,
+      10,
+      19,
+      7
+    ],
+    "mood_volatility": 0.3657484416932246
+  },
+  {
+    "user_id": "user_074_sports_fan",
+    "category_weights": {
+      "politics": 0.021774961021936393,
+      "sports": 0.021774961021936393,
+      "finance": 0.021774961021936393,
+      "tech": 0.021774961021936393,
+      "entertainment": 0.021774961021936393,
+      "health": 0.3835891317212216,
+      "world": 0.48576110214716006,
+      "science": 0.021774961021936393
+    },
+    "curiosity": 0.10245101742589428,
+    "patience": 0.6497998291245449,
+    "recency_bias": 0.8451143607795042,
+    "position_bias": 0.6959270826085207,
+    "satiation_rate": 0.5153182457511556,
+    "session_length": 14,
+    "active_hours": [
+      21,
+      10,
+      13,
+      14,
+      20
+    ],
+    "mood_volatility": 0.4070743650158046
+  },
+  {
+    "user_id": "user_075_news_junkie",
+    "category_weights": {
+      "politics": 0.015074378214972125,
+      "sports": 0.015074378214972125,
+      "finance": 0.20474145853863535,
+      "tech": 0.3725122981950819,
+      "entertainment": 0.015074378214972125,
+      "health": 0.015074378214972125,
+      "world": 0.3473743521914222,
+      "science": 0.015074378214972125
+    },
+    "curiosity": 0.22326524371119505,
+    "patience": 0.8872320636720679,
+    "recency_bias": 0.9183342005738352,
+    "position_bias": 0.6189802933217673,
+    "satiation_rate": 0.11917017146448486,
+    "session_length": 17,
+    "active_hours": [
+      19,
+      7,
+      11,
+      17
+    ],
+    "mood_volatility": 0.4837857501442487
+  },
+  {
+    "user_id": "user_076_casual_browser",
+    "category_weights": {
+      "politics": 0.02097923080147393,
+      "sports": 0.02097923080147393,
+      "finance": 0.02097923080147393,
+      "tech": 0.02097923080147393,
+      "entertainment": 0.02097923080147393,
+      "health": 0.4149751647746872,
+      "world": 0.4591494504164692,
+      "science": 0.02097923080147393
+    },
+    "curiosity": 0.5160278157819224,
+    "patience": 0.24006073545559778,
+    "recency_bias": 0.18761042756901933,
+    "position_bias": 0.747424497831924,
+    "satiation_rate": 0.4240867338446302,
+    "session_length": 9,
+    "active_hours": [
+      7,
+      10,
+      14,
+      15,
+      11,
+      22
+    ],
+    "mood_volatility": 0.7245142244325851
+  },
+  {
+    "user_id": "user_077_deep_reader",
+    "category_weights": {
+      "politics": 0.025070926192874935,
+      "sports": 0.5930935034954297,
+      "finance": 0.025070926192874935,
+      "tech": 0.025070926192874935,
+      "entertainment": 0.2564809393473207,
+      "health": 0.025070926192874935,
+      "world": 0.025070926192874935,
+      "science": 0.025070926192874935
+    },
+    "curiosity": 0.21503937864762077,
+    "patience": 0.934175597577716,
+    "recency_bias": 0.48761708392158865,
+    "position_bias": 0.29504238381860504,
+    "satiation_rate": 0.05,
+    "session_length": 9,
+    "active_hours": [
+      10,
+      8,
+      13,
+      18,
+      22,
+      11
+    ],
+    "mood_volatility": 0.5739556403131989
+  },
+  {
+    "user_id": "user_078_explorer",
+    "category_weights": {
+      "politics": 0.024364188327162917,
+      "sports": 0.3637203915889011,
+      "finance": 0.024364188327162917,
+      "tech": 0.024364188327162917,
+      "entertainment": 0.024364188327162917,
+      "health": 0.024364188327162917,
+      "world": 0.4900944784481213,
+      "science": 0.024364188327162917
+    },
+    "curiosity": 0.8101585328651643,
+    "patience": 0.5491919171506505,
+    "recency_bias": 0.36797667929793576,
+    "position_bias": 0.6831458765854354,
+    "satiation_rate": 0.8179440120721286,
+    "session_length": 17,
+    "active_hours": [
+      21,
+      7,
+      15,
+      22,
+      9
+    ],
+    "mood_volatility": 0.5786966101127844
+  },
+  {
+    "user_id": "user_079_sports_fan",
+    "category_weights": {
+      "politics": 0.023792101258893222,
+      "sports": 0.023792101258893222,
+      "finance": 0.023792101258893222,
+      "tech": 0.2701757254294268,
+      "entertainment": 0.023792101258893222,
+      "health": 0.5870716670172139,
+      "world": 0.023792101258893222,
+      "science": 0.023792101258893222
+    },
+    "curiosity": 0.05308243478952952,
+    "patience": 0.42868654709091225,
+    "recency_bias": 0.8353872374165412,
+    "position_bias": 0.5885460154747382,
+    "satiation_rate": 0.4237816311973462,
+    "session_length": 8,
+    "active_hours": [
+      11,
+      15,
+      20,
+      6,
+      19,
+      22
+    ],
+    "mood_volatility": 0.6776860790973271
+  },
+  {
+    "user_id": "user_080_news_junkie",
+    "category_weights": {
+      "politics": 0.027682991751845753,
+      "sports": 0.027682991751845753,
+      "finance": 0.3782316500330181,
+      "tech": 0.027682991751845753,
+      "entertainment": 0.027682991751845753,
+      "health": 0.45567039945590726,
+      "world": 0.027682991751845753,
+      "science": 0.027682991751845753
+    },
+    "curiosity": 0.14055723412056326,
+    "patience": 0.7400624977046227,
+    "recency_bias": 0.9005243699718183,
+    "position_bias": 0.40469805937647424,
+    "satiation_rate": 0.15499345285207564,
+    "session_length": 18,
+    "active_hours": [
+      11,
+      22,
+      7,
+      15
+    ],
+    "mood_volatility": 0.722503759186913
+  },
+  {
+    "user_id": "user_081_casual_browser",
+    "category_weights": {
+      "politics": 0.020888306746704135,
+      "sports": 0.020888306746704135,
+      "finance": 0.020888306746704135,
+      "tech": 0.2537253700510403,
+      "entertainment": 0.2884604160527693,
+      "health": 0.020888306746704135,
+      "world": 0.020888306746704135,
+      "science": 0.3533726801626697
+    },
+    "curiosity": 0.6622849932347499,
+    "patience": 0.19323795706174055,
+    "recency_bias": 0.3857620514978707,
+    "position_bias": 0.8120295631711899,
+    "satiation_rate": 0.5514438834058749,
+    "session_length": 13,
+    "active_hours": [
+      20,
+      15,
+      16
+    ],
+    "mood_volatility": 0.5279588825612171
+  },
+  {
+    "user_id": "user_082_deep_reader",
+    "category_weights": {
+      "politics": 0.032073348387481396,
+      "sports": 0.032073348387481396,
+      "finance": 0.032073348387481396,
+      "tech": 0.032073348387481396,
+      "entertainment": 0.032073348387481396,
+      "health": 0.032073348387481396,
+      "world": 0.032073348387481396,
+      "science": 0.7754865612876302
+    },
+    "curiosity": 0.271161487808889,
+    "patience": 0.787535790816213,
+    "recency_bias": 0.14658858292643775,
+    "position_bias": 0.3277676821898509,
+    "satiation_rate": 0.13323140119795918,
+    "session_length": 14,
+    "active_hours": [
+      14,
+      20,
+      19,
+      10,
+      9,
+      12
+    ],
+    "mood_volatility": 0.7120012751961116
+  },
+  {
+    "user_id": "user_083_explorer",
+    "category_weights": {
+      "politics": 0.04401318474569162,
+      "sports": 0.04401318474569162,
+      "finance": 0.04401318474569162,
+      "tech": 0.6919077067801587,
+      "entertainment": 0.04401318474569162,
+      "health": 0.04401318474569162,
+      "world": 0.04401318474569162,
+      "science": 0.04401318474569162
+    },
+    "curiosity": 0.8251513463443446,
+    "patience": 0.6551151975522523,
+    "recency_bias": 0.5115674634292858,
+    "position_bias": 0.6179297184063827,
+    "satiation_rate": 0.7067518481410109,
+    "session_length": 16,
+    "active_hours": [
+      15,
+      6,
+      19,
+      16,
+      12
+    ],
+    "mood_volatility": 0.3646882281069367
+  },
+  {
+    "user_id": "user_084_sports_fan",
+    "category_weights": {
+      "politics": 0.28937196335415327,
+      "sports": 0.0165820564656577,
+      "finance": 0.0165820564656577,
+      "tech": 0.0165820564656577,
+      "entertainment": 0.3907118759664208,
+      "health": 0.23700587835113734,
+      "world": 0.0165820564656577,
+      "science": 0.0165820564656577
+    },
+    "curiosity": 0.3060747924881987,
+    "patience": 0.7755340842443205,
+    "recency_bias": 0.6751035851520926,
+    "position_bias": 0.6971570950954356,
+    "satiation_rate": 0.36453759495851473,
+    "session_length": 12,
+    "active_hours": [
+      13,
+      12,
+      15,
+      10,
+      16
+    ],
+    "mood_volatility": 0.6533463942450064
+  },
+  {
+    "user_id": "user_085_news_junkie",
+    "category_weights": {
+      "politics": 0.23272831582349252,
+      "sports": 0.015903267939238557,
+      "finance": 0.37453874683998045,
+      "tech": 0.015903267939238557,
+      "entertainment": 0.015903267939238557,
+      "health": 0.31321659764033427,
+      "world": 0.015903267939238557,
+      "science": 0.015903267939238557
+    },
+    "curiosity": 0.43686315575323487,
+    "patience": 0.7035076539419896,
+    "recency_bias": 0.95,
+    "position_bias": 0.5058424486849589,
+    "satiation_rate": 0.05,
+    "session_length": 19,
+    "active_hours": [
+      17,
+      10,
+      7
+    ],
+    "mood_volatility": 0.7457766873915961
+  },
+  {
+    "user_id": "user_086_casual_browser",
+    "category_weights": {
+      "politics": 0.024504029808075197,
+      "sports": 0.5341312985696197,
+      "finance": 0.024504029808075197,
+      "tech": 0.024504029808075197,
+      "entertainment": 0.024504029808075197,
+      "health": 0.024504029808075197,
+      "world": 0.3188445225819291,
+      "science": 0.024504029808075197
+    },
+    "curiosity": 0.48167414873342246,
+    "patience": 0.09607678222398991,
+    "recency_bias": 0.37305931655554425,
+    "position_bias": 0.8717542255795963,
+    "satiation_rate": 0.6502357052096028,
+    "session_length": 16,
+    "active_hours": [
+      11,
+      14,
+      20,
+      19,
+      13
+    ],
+    "mood_volatility": 0.7804304457000875
+  },
+  {
+    "user_id": "user_087_deep_reader",
+    "category_weights": {
+      "politics": 0.023713009037067165,
+      "sports": 0.023713009037067165,
+      "finance": 0.023713009037067165,
+      "tech": 0.023713009037067165,
+      "entertainment": 0.023713009037067165,
+      "health": 0.2780953950739596,
+      "world": 0.5796265507036374,
+      "science": 0.023713009037067165
+    },
+    "curiosity": 0.20740947804197754,
+    "patience": 0.95,
+    "recency_bias": 0.16198985417851083,
+    "position_bias": 0.05,
+    "satiation_rate": 0.09444523011033813,
+    "session_length": 9,
+    "active_hours": [
+      18,
+      17,
+      7,
+      22
+    ],
+    "mood_volatility": 0.4367447361972272
+  },
+  {
+    "user_id": "user_088_explorer",
+    "category_weights": {
+      "politics": 0.023384177353254314,
+      "sports": 0.3631278596966957,
+      "finance": 0.023384177353254314,
+      "tech": 0.49656707618377843,
+      "entertainment": 0.023384177353254314,
+      "health": 0.023384177353254314,
+      "world": 0.023384177353254314,
+      "science": 0.023384177353254314
+    },
+    "curiosity": 0.9384065448939307,
+    "patience": 0.4967305251905907,
+    "recency_bias": 0.2932557899960123,
+    "position_bias": 0.49108799604872116,
+    "satiation_rate": 0.5695530499495146,
+    "session_length": 13,
+    "active_hours": [
+      17,
+      9,
+      16,
+      21,
+      13,
+      6
+    ],
+    "mood_volatility": 0.5717281202267178
+  },
+  {
+    "user_id": "user_089_sports_fan",
+    "category_weights": {
+      "politics": 0.016337237813827617,
+      "sports": 0.27714511539042835,
+      "finance": 0.016337237813827617,
+      "tech": 0.016337237813827617,
+      "entertainment": 0.31908355295418495,
+      "health": 0.3220851425862486,
+      "world": 0.016337237813827617,
+      "science": 0.016337237813827617
+    },
+    "curiosity": 0.16696725488300385,
+    "patience": 0.6366598246096848,
+    "recency_bias": 0.6060120213672644,
+    "position_bias": 0.5486133082663306,
+    "satiation_rate": 0.19407864781110484,
+    "session_length": 14,
+    "active_hours": [
+      9,
+      10,
+      6,
+      20,
+      21,
+      13
+    ],
+    "mood_volatility": 0.26967228843506574
+  },
+  {
+    "user_id": "user_090_news_junkie",
+    "category_weights": {
+      "politics": 0.0438026145313834,
+      "sports": 0.0438026145313834,
+      "finance": 0.6933816982803161,
+      "tech": 0.0438026145313834,
+      "entertainment": 0.0438026145313834,
+      "health": 0.0438026145313834,
+      "world": 0.0438026145313834,
+      "science": 0.0438026145313834
+    },
+    "curiosity": 0.2937320902726828,
+    "patience": 0.8955142320501239,
+    "recency_bias": 0.8014273953664457,
+    "position_bias": 0.45040465155178444,
+    "satiation_rate": 0.14697423816275593,
+    "session_length": 16,
+    "active_hours": [
+      10,
+      19,
+      16,
+      7,
+      13,
+      15
+    ],
+    "mood_volatility": 0.4448695314186204
+  },
+  {
+    "user_id": "user_091_casual_browser",
+    "category_weights": {
+      "politics": 0.4071834724378558,
+      "sports": 0.0261720527857413,
+      "finance": 0.0261720527857413,
+      "tech": 0.0261720527857413,
+      "entertainment": 0.0261720527857413,
+      "health": 0.43578421084769636,
+      "world": 0.0261720527857413,
+      "science": 0.0261720527857413
+    },
+    "curiosity": 0.5207127167737655,
+    "patience": 0.2892969640045442,
+    "recency_bias": 0.2964757677580626,
+    "position_bias": 0.7446350694652818,
+    "satiation_rate": 0.38021221074111516,
+    "session_length": 12,
+    "active_hours": [
+      9,
+      17,
+      14,
+      16,
+      11
+    ],
+    "mood_volatility": 0.23633005349996528
+  },
+  {
+    "user_id": "user_092_deep_reader",
+    "category_weights": {
+      "politics": 0.42516548731598686,
+      "sports": 0.01901211959874526,
+      "finance": 0.01901211959874526,
+      "tech": 0.46076179509154164,
+      "entertainment": 0.01901211959874526,
+      "health": 0.01901211959874526,
+      "world": 0.01901211959874526,
+      "science": 0.01901211959874526
+    },
+    "curiosity": 0.39647251329163896,
+    "patience": 0.9035263551971728,
+    "recency_bias": 0.23002744920074142,
+    "position_bias": 0.22139799107342223,
+    "satiation_rate": 0.08876719503091703,
+    "session_length": 7,
+    "active_hours": [
+      6,
+      7,
+      18,
+      11
+    ],
+    "mood_volatility": 0.3461413382984142
+  },
+  {
+    "user_id": "user_093_explorer",
+    "category_weights": {
+      "politics": 0.055465724831858125,
+      "sports": 0.055465724831858125,
+      "finance": 0.055465724831858125,
+      "tech": 0.6117399261769931,
+      "entertainment": 0.055465724831858125,
+      "health": 0.055465724831858125,
+      "world": 0.055465724831858125,
+      "science": 0.055465724831858125
+    },
+    "curiosity": 0.8779030400466777,
+    "patience": 0.5614166700043425,
+    "recency_bias": 0.5757507710047305,
+    "position_bias": 0.44694988523894724,
+    "satiation_rate": 0.642418175935532,
+    "session_length": 11,
+    "active_hours": [
+      13,
+      16,
+      18,
+      8
+    ],
+    "mood_volatility": 0.6731862525665657
+  },
+  {
+    "user_id": "user_094_sports_fan",
+    "category_weights": {
+      "politics": 0.35500848789289063,
+      "sports": 0.3144440854175761,
+      "finance": 0.2590103731739305,
+      "tech": 0.01430741070312054,
+      "entertainment": 0.01430741070312054,
+      "health": 0.01430741070312054,
+      "world": 0.01430741070312054,
+      "science": 0.01430741070312054
+    },
+    "curiosity": 0.07249483028483561,
+    "patience": 0.36980788352644145,
+    "recency_bias": 0.5484808937801448,
+    "position_bias": 0.7366874267444524,
+    "satiation_rate": 0.46449677135012835,
+    "session_length": 8,
+    "active_hours": [
+      10,
+      6,
+      11
+    ],
+    "mood_volatility": 0.6739907985408524
+  },
+  {
+    "user_id": "user_095_news_junkie",
+    "category_weights": {
+      "politics": 0.05801569076971077,
+      "sports": 0.05801569076971077,
+      "finance": 0.05801569076971077,
+      "tech": 0.05801569076971077,
+      "entertainment": 0.05801569076971077,
+      "health": 0.5938901646120246,
+      "world": 0.05801569076971077,
+      "science": 0.05801569076971077
+    },
+    "curiosity": 0.27509639604436215,
+    "patience": 0.8576556963055767,
+    "recency_bias": 0.9311250154543537,
+    "position_bias": 0.7078880808455238,
+    "satiation_rate": 0.3119574911434577,
+    "session_length": 13,
+    "active_hours": [
+      10,
+      19,
+      14
+    ],
+    "mood_volatility": 0.268189584071928
+  },
+  {
+    "user_id": "user_096_casual_browser",
+    "category_weights": {
+      "politics": 0.0421511800550736,
+      "sports": 0.0421511800550736,
+      "finance": 0.0421511800550736,
+      "tech": 0.0421511800550736,
+      "entertainment": 0.0421511800550736,
+      "health": 0.0421511800550736,
+      "world": 0.0421511800550736,
+      "science": 0.7049417396144848
+    },
+    "curiosity": 0.5872082408519234,
+    "patience": 0.2044459559399574,
+    "recency_bias": 0.23935536797424276,
+    "position_bias": 0.8203463635867223,
+    "satiation_rate": 0.4243649254715697,
+    "session_length": 16,
+    "active_hours": [
+      20,
+      13,
+      15
+    ],
+    "mood_volatility": 0.22601902213950303
+  },
+  {
+    "user_id": "user_097_deep_reader",
+    "category_weights": {
+      "politics": 0.017373929655463128,
+      "sports": 0.017373929655463128,
+      "finance": 0.017373929655463128,
+      "tech": 0.18959094182074765,
+      "entertainment": 0.4249731429284324,
+      "health": 0.2985662669735043,
+      "world": 0.017373929655463128,
+      "science": 0.017373929655463128
+    },
+    "curiosity": 0.05777462904023259,
+    "patience": 0.8353427115757474,
+    "recency_bias": 0.1918451996385605,
+    "position_bias": 0.3687141635072565,
+    "satiation_rate": 0.18816397569494506,
+    "session_length": 17,
+    "active_hours": [
+      9,
+      21,
+      17,
+      13,
+      7,
+      18
+    ],
+    "mood_volatility": 0.3932670918477957
+  },
+  {
+    "user_id": "user_098_explorer",
+    "category_weights": {
+      "politics": 0.05293000997546495,
+      "sports": 0.6294899301717453,
+      "finance": 0.05293000997546495,
+      "tech": 0.05293000997546495,
+      "entertainment": 0.05293000997546495,
+      "health": 0.05293000997546495,
+      "world": 0.05293000997546495,
+      "science": 0.05293000997546495
+    },
+    "curiosity": 0.8992027358683383,
+    "patience": 0.6479944138890026,
+    "recency_bias": 0.5077368307647618,
+    "position_bias": 0.4138715798671736,
+    "satiation_rate": 0.8523124077269657,
+    "session_length": 15,
+    "active_hours": [
+      22,
+      15,
+      13,
+      14,
+      21,
+      12
+    ],
+    "mood_volatility": 0.2595070770074252
+  },
+  {
+    "user_id": "user_099_sports_fan",
+    "category_weights": {
+      "politics": 0.014900733620448879,
+      "sports": 0.29449437369209863,
+      "finance": 0.014900733620448879,
+      "tech": 0.014900733620448879,
+      "entertainment": 0.014900733620448879,
+      "health": 0.3101229899210106,
+      "world": 0.32087896828464635,
+      "science": 0.014900733620448879
+    },
+    "curiosity": 0.15389100436846587,
+    "patience": 0.4962753845673543,
+    "recency_bias": 0.6809661321916392,
+    "position_bias": 0.5124381746615243,
+    "satiation_rate": 0.16172002690356638,
+    "session_length": 11,
+    "active_hours": [
+      20,
+      13,
+      12,
+      11,
+      21,
+      22
+    ],
+    "mood_volatility": 0.4495937901568972
+  }
+]
