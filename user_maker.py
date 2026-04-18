@@ -8,11 +8,12 @@ import random
 @dataclass
 class Article:
     id: str
-    category: str        # 'politics', 'sports', 'finance', 'tech', 'entertainment'
+    category: str
     subcategory: str
     title: str
-    vec: np.ndarray      # news_vec from NRMS, shape (256,)
-    freshness: float     # 0-1, 1 = just published
+    vec: np.ndarray
+    freshness: float
+    summary: str = ""
 
 # ── user policy (defines who this user is) ──────────────────────────────────
 @dataclass
@@ -199,49 +200,56 @@ class UserEngine:
 
 # ── factory: generate 100 diverse users ─────────────────────────────────────
 
-CATEGORIES = ['politics', 'sports', 'finance', 'tech', 'entertainment', 
-              'health', 'world', 'science']
+# Must match config.CATEGORIES exactly (case-sensitive)
+CATEGORIES = [
+    "AI", "Bitcoin", "Business", "Cricket", "Crypto", "Education", "Elections",
+    "Entertainment", "Environment", "Finance", "Health", "IPL", "Inflation",
+    "Markets", "Movies", "OpenAI", "Politics", "Science", "Sports", "Startups",
+    "Technology", "Tesla", "War", "World",
+]
 
-def random_category_weights() -> Dict[str, float]:
-    """Generate realistic category preferences - users have 1-3 strong interests."""
-    weights = {c: 0.02 for c in CATEGORIES}
-    
-    # pick 1-3 dominant categories
-    n_interests = random.randint(1, 3)
-    dominant = random.sample(CATEGORIES, n_interests)
-    
+# Dominant categories per simulated-user archetype
+_ARCHETYPE_DOMINANT: Dict[str, List[str]] = {
+    "news_junkie":    ["Politics", "World", "Elections", "War", "Business"],
+    "casual_browser": ["Entertainment", "Movies", "Sports", "Cricket"],
+    "deep_reader":    ["Science", "Technology", "AI", "World", "OpenAI"],
+    "explorer":       CATEGORIES,   # equal spread
+    "sports_fan":     ["Sports", "Cricket", "IPL", "Entertainment"],
+}
+
+
+def _category_weights_for(archetype_name: str) -> Dict[str, float]:
+    dominant = _ARCHETYPE_DOMINANT[archetype_name]
+    weights = {c: 0.01 for c in CATEGORIES}
     for cat in dominant:
-        weights[cat] = random.uniform(0.2, 0.5)
-    
-    # normalize
+        weights[cat] = random.uniform(0.15, 0.35)
     total = sum(weights.values())
-    return {k: v/total for k, v in weights.items()}
+    return {k: v / total for k, v in weights.items()}
+
 
 def generate_user_population(n: int = 100, seed: int = 42) -> List[UserPolicy]:
     random.seed(seed)
     np.random.seed(seed)
-    
-    # define archetypes so population is diverse, not just random noise
+
+    # (curiosity, patience, recency_bias, position_bias, satiation_rate)
     archetypes = [
-        # (curiosity, patience, recency_bias, position_bias, satiation_rate)
-        {'name': 'news_junkie',    'traits': (0.3, 0.8, 0.9, 0.4, 0.2)},
-        {'name': 'casual_browser', 'traits': (0.6, 0.3, 0.4, 0.8, 0.5)},
-        {'name': 'deep_reader',    'traits': (0.2, 0.9, 0.3, 0.2, 0.1)},
-        {'name': 'explorer',       'traits': (0.9, 0.5, 0.5, 0.5, 0.7)},
-        {'name': 'sports_fan',     'traits': (0.1, 0.6, 0.7, 0.6, 0.3)},
+        {"name": "news_junkie",    "traits": (0.3, 0.8, 0.9, 0.4, 0.2)},
+        {"name": "casual_browser", "traits": (0.6, 0.3, 0.4, 0.8, 0.5)},
+        {"name": "deep_reader",    "traits": (0.2, 0.9, 0.3, 0.2, 0.1)},
+        {"name": "explorer",       "traits": (0.9, 0.5, 0.5, 0.5, 0.7)},
+        {"name": "sports_fan",     "traits": (0.1, 0.6, 0.7, 0.6, 0.3)},
     ]
-    
+
     users = []
     for i in range(n):
-        archetype = archetypes[i % len(archetypes)]
-        c, pa, r, pb, s = archetype['traits']
-        
-        # add noise to each trait so users within archetype differ
+        arch = archetypes[i % len(archetypes)]
+        c, pa, r, pb, s = arch["traits"]
+
         def noisy(x): return float(np.clip(x + np.random.normal(0, 0.1), 0.05, 0.95))
-        
+
         policy = UserPolicy(
-            user_id=f"user_{i:03d}_{archetype['name']}",
-            category_weights=random_category_weights(),
+            user_id=f"user_{i:03d}_{arch['name']}",
+            category_weights=_category_weights_for(arch["name"]),
             curiosity=noisy(c),
             patience=noisy(pa),
             recency_bias=noisy(r),
@@ -252,7 +260,7 @@ def generate_user_population(n: int = 100, seed: int = 42) -> List[UserPolicy]:
             mood_volatility=random.uniform(0.2, 0.8),
         )
         users.append(policy)
-    
+
     return users
 
 
@@ -289,7 +297,7 @@ def compute_reward(interactions: List[Dict]) -> float:
     cat_counts = {c: cats.count(c) for c in set(cats)}
     probs = np.array(list(cat_counts.values())) / len(cats)
     entropy = -np.sum(probs * np.log(probs + 1e-8))
-    max_entropy = np.log(len(CATEGORIES))
+    max_entropy = np.log(len(CATEGORIES)) if len(CATEGORIES) > 1 else 1.0
     diversity_bonus = 0.4 * (entropy / max_entropy)
     
     # mood trajectory bonus: did mood improve during session?
