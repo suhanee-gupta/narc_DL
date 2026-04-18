@@ -24,7 +24,7 @@ class RecommendRequest(BaseModel):
     time_of_day: str = Field("morning", description="morning | afternoon | evening | night")
     location: str = "Global"
     top_n: int = Field(settings.FINAL_TOP_N, ge=1, le=50, description="Number of articles to return.")
-    explicit_ratings: dict = Field(default_factory=dict, description="{article_id: 1-5}")
+    explicit_ratings: dict = Field(default_factory=dict, description="{article_id: 'like' | 'dislike' | 'neutral'}")
     dwell_times: dict = Field(default_factory=dict, description="{article_id: seconds_spent}")
 
     @validator("mood")
