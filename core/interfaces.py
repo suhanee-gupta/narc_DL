@@ -34,6 +34,7 @@ class ContextObject:
         self,
         user_id: str,
         mood: str,
+        location: str,
         time_of_day: str,              # e.g. "morning", "evening"
         history: List[str],            # Last N article IDs (most-recent first)
         explicit_ratings: dict | None = None,   # {article_id: 1-5}
@@ -42,6 +43,7 @@ class ContextObject:
         self.user_id = user_id
         self.mood = mood
         self.time_of_day = time_of_day
+        self.location = location
         self.history = history
         self.explicit_ratings = explicit_ratings or {}
         self.dwell_times = dwell_times or {}
@@ -49,7 +51,7 @@ class ContextObject:
     def __repr__(self) -> str:
         return (
             f"ContextObject(user={self.user_id!r}, mood={self.mood!r}, "
-            f"time={self.time_of_day!r}, history_len={len(self.history)})"
+            f"time={self.time_of_day!r}, history_len={len(self.history)}, location={self.location})"
         )
 
 

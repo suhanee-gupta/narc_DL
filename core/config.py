@@ -41,16 +41,17 @@ class Config:
     # ── RL Exploration ──────────────────────────────────────────────────────
     # Fraction of final recommendations that are "exploration" items.
     EXPLORATION_RATIO: float = float(os.getenv("EXPLORATION_RATIO", "0.2"))
-
+    
     # ── Latency budget (ms) ─────────────────────────────────────────────────
     LATENCY_BUDGET_MS: int = int(os.getenv("LATENCY_BUDGET_MS", "2000"))
 
     # ── Mood options (used for validation) ─────────────────────────────────
     VALID_MOODS: list = field(default_factory=lambda: [
-        "happy", "sad", "excited", "calm", "curious",
-        "stressed", "bored", "motivated", "neutral"
+        "happy", "sad", "angry", "anxious", "calm",
+        "curious"
     ])
 
+    VALID_LOCATIONS = ["IN", "US", "UK"]
 
 # Singleton config object
 settings = Config()

@@ -22,6 +22,7 @@ class RecommendRequest(BaseModel):
     user_id: str = Field(..., description="Unique user identifier.")
     mood: str = Field("neutral", description="Current mood of the user.")
     time_of_day: str = Field("morning", description="morning | afternoon | evening | night")
+    location: str = "Global"
     top_n: int = Field(settings.FINAL_TOP_N, ge=1, le=50, description="Number of articles to return.")
     explicit_ratings: dict = Field(default_factory=dict, description="{article_id: 1-5}")
     dwell_times: dict = Field(default_factory=dict, description="{article_id: seconds_spent}")
@@ -39,6 +40,11 @@ class RecommendRequest(BaseModel):
             raise ValueError(f"time_of_day must be one of {allowed}")
         return v
 
+    @validator("location")
+    def validate_location(cls, v):
+        if v not in settings.VALID_LOCATIONS:
+            raise ValueError(f"Location must be one of {settings.VALID_LOCATIONS}")
+        return v
 
 class ArticleMeta(BaseModel):
     story_id: str
