@@ -278,10 +278,11 @@ class RLEnvironment:
             # slow loop flush — stable user_vec update every N rounds
             if round_idx > 0 and round_idx % SLOW_LOOP_FLUSH_EVERY == 0:
                 self.ctx.flush_updates()
-                profile = ups.load(user_id)
 
             # refresh reranker every N rounds using in-session clicks
-            if round_idx > 0 and round_idx % RERANK_REFRESH_EVERY == 0:
+            # Also refresh if the last round was a total failure (reward < 0)
+            if round_idx > 0 and (round_idx % RERANK_REFRESH_EVERY == 0):
+                profile = ups.load(user_id)
                 ctx_vecs, candidates = _build_candidates(result.interactions)
 
             top_k    = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
@@ -360,8 +361,8 @@ def _random_mood() -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate",         action="store_true")
-    parser.add_argument("--users",            type=int, default=10)
-    parser.add_argument("--sessions",         type=int, default=20)
+    parser.add_argument("--users",            type=int, default=100)
+    parser.add_argument("--sessions",         type=int, default=5)
     parser.add_argument("--checkpoint-dir",   type=str, default="checkpoints")
     parser.add_argument("--checkpoint-every", type=int, default=5)
     parser.add_argument("--resume",           type=str, default=None,
