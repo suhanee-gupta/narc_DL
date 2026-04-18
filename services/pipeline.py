@@ -85,9 +85,10 @@ async def run_inference(
     context = ContextObject(
         user_id=user_id,
         mood=mood,
+        top_k=_top_k,
         time_of_day=time_of_day,
         location=location,
-        history=history,
+        history=list(history),
         explicit_ratings=explicit_ratings or {},
         dwell_times={**dwell, **(dwell_times or {})},
     )
@@ -95,21 +96,11 @@ async def run_inference(
     logger.debug("Step A done — context: %s", context)
 
     # ────────────────────────────────────────────────────────────────────────
-    # STEP B: State Encoding  (First Black Box)
-    #   ContextObject  →  user vector  ∈  ℝ^d
-    # ────────────────────────────────────────────────────────────────────────
-    # Run CPU-bound encoding in a thread so we don't block the event loop.
-    user_vector = await asyncio.get_event_loop().run_in_executor(
-        None, registry.encoder.encode, context
-    )
-    logger.debug("Step B done — vector shape: %s", user_vector.shape)
-
-    # ────────────────────────────────────────────────────────────────────────
     # STEP C: Candidate Retrieval  (ANN / FAISS)
     #   user vector  →  Top-K article IDs  (~5–10 ms with FAISS)
     # ────────────────────────────────────────────────────────────────────────
     candidate_ids = await asyncio.get_event_loop().run_in_executor(
-        None, registry.retriever.retrieve, user_vector, _top_k
+        None, registry.retriever.retrieve, context
     )
     logger.debug("Step C done — %d candidates retrieved.", len(candidate_ids))
 
