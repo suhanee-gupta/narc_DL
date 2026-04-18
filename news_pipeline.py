@@ -62,8 +62,9 @@ class NewsPipeline:
                 category=row.get("category", ""),
                 subcategory=(row.get("tags") or [""])[0],
                 title=row.get("title", ""),
-                vec=np.zeros(1, dtype=np.float32),   # not used by UserEngine
+                vec=np.zeros(1, dtype=np.float32),
                 freshness=_freshness(row.get("published_date", "")),
+                summary=row.get("summary", ""),
             )
             self._articles.append(article)
             self._by_id[sid] = article

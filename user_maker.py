@@ -8,11 +8,12 @@ import random
 @dataclass
 class Article:
     id: str
-    category: str        # 'politics', 'sports', 'finance', 'tech', 'entertainment'
+    category: str
     subcategory: str
     title: str
-    vec: np.ndarray      # news_vec from NRMS, shape (256,)
-    freshness: float     # 0-1, 1 = just published
+    vec: np.ndarray
+    freshness: float
+    summary: str = ""
 
 # ── user policy (defines who this user is) ──────────────────────────────────
 @dataclass

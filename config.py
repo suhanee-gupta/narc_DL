@@ -3,7 +3,9 @@ CONTEXT_DIM = 46
 
 TOP_N_CANDIDATES = 200
 TOP_K_RECS = 10
-FAST_LOOP_ROUNDS = 3
+FAST_LOOP_ROUNDS = 15        # rounds per user per session
+SLOW_LOOP_FLUSH_EVERY = 3    # flush slow loop every N rounds within a session (15/3 = 5 flushes)
+RERANK_REFRESH_EVERY = 3     # re-run reranker every N rounds
 BANDIT_ALPHA = 0.5
 
 SLOW_LOOP_INTERVAL_SEC = 3600

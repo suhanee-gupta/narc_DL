@@ -32,6 +32,7 @@ import context_encoder
 import query_builder
 from config import (
     TOP_N_CANDIDATES, TOP_K_RECS, FAST_LOOP_ROUNDS,
+    SLOW_LOOP_FLUSH_EVERY, RERANK_REFRESH_EVERY,
     ARCHETYPE_CATEGORY_WEIGHTS, MOOD_MODIFIERS,
     CATEGORIES, LOCATIONS, EMBED_DIM,
 )
@@ -163,7 +164,7 @@ class RLEnvironment:
         pairs = _candidate_pool(articles, user_vec, embeddings, archetype, mood)
 
         # cross-encoder rerank
-        docs   = [f"{a.title}. {a.category}" for a, _ in pairs]
+        docs   = [f"{a.title}. {a.summary}" for a, _ in pairs]
         query  = query_builder.build(archetype, mood, location, timestamp,
                                      profile.get("click_history", []))
         scores = score_pairs(query, docs)
@@ -178,11 +179,12 @@ class RLEnvironment:
 
         return [
             {
-                "rank":           i + 1,
-                "story_id":       a.id,
-                "title":          a.title,
-                "category":       a.category,
-                "freshness":      round(a.freshness, 4),
+                "rank":      i + 1,
+                "story_id":  a.id,
+                "title":     a.title,
+                "summary":   a.summary,
+                "category":  a.category,
+                "freshness": round(a.freshness, 4),
             }
             for i, a in enumerate(top_k)
         ]
@@ -231,34 +233,58 @@ class RLEnvironment:
         archetype = _policy_archetype(policy)
         user_id   = policy.user_id
 
-        profile = ups.load(user_id)
+        profile  = ups.load(user_id)
         if profile["archetype"] == "cold_start":
             profile["archetype"] = archetype
             ups.save(user_id, profile)
 
-        user_vec   = self.ctx.get_vector(user_id)
         articles   = self.pipeline.get_articles()
         embeddings = self.pipeline.get_all_embeddings()
 
-        pairs = _candidate_pool(articles, user_vec, embeddings, archetype, mood)
+        _POSITIVE_ACTIONS = {"share", "dwell_long", "click"}
 
-        docs   = [f"{a.title}. {a.category}" for a, _ in pairs]
-        query  = query_builder.build(archetype, mood, location, timestamp,
-                                     profile.get("click_history", []))
-        scores = score_pairs(query, docs)
-        ranked = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:20]
+        def _build_candidates(session_interactions: list):
+            """Re-run candidate pool + reranker using current user_vec and
+            in-session positive clicks appended to click_history."""
+            uv     = self.ctx.get_vector(user_id)
+            pairs  = _candidate_pool(articles, uv, embeddings, archetype, mood)
+            # include in-session positive clicks in query so reranker adapts
+            session_pos = [
+                {"title": self.pipeline.get_article(ix["article_id"]).title or ""}
+                for ix in session_interactions
+                if ix["action"] in _POSITIVE_ACTIONS
+                and self.pipeline.get_article(ix["article_id"]) is not None
+            ]
+            q = query_builder.build(
+                archetype, mood, location, timestamp,
+                profile.get("click_history", []) + session_pos,
+            )
+            docs    = [f"{a.title}. {a.summary}" for a, _ in pairs]
+            scores  = score_pairs(q, docs)
+            ranked  = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:20]
+            cvecs   = [context_encoder.build(mood, archetype, location, timestamp,
+                                              a.category, a.freshness, s)
+                       for (a, _), s in ranked]
+            cands   = [a for (a, _), _ in ranked]
+            return cvecs, cands
 
-        ctx_vecs   = [context_encoder.build(mood, archetype, location, timestamp,
-                                             a.category, a.freshness, s)
-                      for (a, _), s in ranked]
-        candidates = [a for (a, _), _ in ranked]
+        ctx_vecs, candidates = _build_candidates([])
 
         engine = UserEngine(policy)
         state  = engine.start_session()
         result = SessionResult(user_id=user_id)
 
         for round_idx in range(FAST_LOOP_ROUNDS):
-            top_k = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
+            # slow loop flush — stable user_vec update every N rounds
+            if round_idx > 0 and round_idx % SLOW_LOOP_FLUSH_EVERY == 0:
+                self.ctx.flush_updates()
+                profile = ups.load(user_id)   # reload click_history after flush
+
+            # refresh reranker every RERANK_REFRESH_EVERY rounds after the first
+            if round_idx > 0 and round_idx % RERANK_REFRESH_EVERY == 0:
+                ctx_vecs, candidates = _build_candidates(result.interactions)
+
+            top_k    = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
             top_ctxs = [ctx_vecs[candidates.index(a)] for a in top_k]
 
             interactions, state = engine.interact_with_feed(top_k, state)
@@ -327,7 +353,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate",         action="store_true")
     parser.add_argument("--users",            type=int, default=10)
-    parser.add_argument("--sessions",         type=int, default=5)
+    parser.add_argument("--sessions",         type=int, default=20)
     parser.add_argument("--checkpoint-dir",   type=str, default="checkpoints")
     parser.add_argument("--checkpoint-every", type=int, default=5)
     parser.add_argument("--resume",           type=str, default=None,
