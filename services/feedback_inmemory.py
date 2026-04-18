@@ -29,6 +29,7 @@ class InMemoryFeedbackStore(BaseFeedbackStore):
         )
         # {user_id: {article_id: total_dwell_seconds}}
         self._dwell: Dict[str, Dict[str, float]] = defaultdict(dict)
+        self._last_candidates: Dict[str, List[str]] = {}
         self._lock = asyncio.Lock()
 
     async def log_click(self, user_id: str, article_id: str, reward: float) -> None:
@@ -50,6 +51,14 @@ class InMemoryFeedbackStore(BaseFeedbackStore):
     async def get_dwell_times(self, user_id: str) -> dict:
         async with self._lock:
             return dict(self._dwell.get(user_id, {}))
+        
+    async def log_candidates(self, user_id: str, article_ids: List[str]) -> None:
+        async with self._lock:
+            self._last_candidates[user_id] = article_ids
 
+    async def get_last_candidates(self, user_id: str) -> List[str]:
+        async with self._lock:
+            return self._last_candidates.get(user_id, [])
+        
     def user_count(self) -> int:
         return len(self._history)
