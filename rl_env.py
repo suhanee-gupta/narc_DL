@@ -271,25 +271,32 @@ class RLEnvironment:
         ctx_vecs, candidates = _build_candidates([])
 
         engine = UserEngine(policy)
-        state  = engine.start_session()
         result = SessionResult(user_id=user_id)
 
+        print(f"    Learning Trajectory (User {user_id[:8]}...): ", end="", flush=True)
         for round_idx in range(FAST_LOOP_ROUNDS):
             # slow loop flush — stable user_vec update every N rounds
             if round_idx > 0 and round_idx % SLOW_LOOP_FLUSH_EVERY == 0:
                 self.ctx.flush_updates()
-                profile = ups.load(user_id)   # reload click_history after flush
+                profile = ups.load(user_id)
 
-            # refresh reranker every RERANK_REFRESH_EVERY rounds after the first
+            # refresh reranker every N rounds using in-session clicks
             if round_idx > 0 and round_idx % RERANK_REFRESH_EVERY == 0:
                 ctx_vecs, candidates = _build_candidates(result.interactions)
 
             top_k    = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
             top_ctxs = [ctx_vecs[candidates.index(a)] for a in top_k]
 
-            interactions, state = engine.interact_with_feed(top_k, state)
+            # fresh state each round — session_length applies per round, not total
+            state = engine.start_session()
+            interactions, _ = engine.interact_with_feed(top_k, state)
             if not interactions:
+                print(" [Session End]", end="")
                 break
+
+            # Track reward for THIS specific round to see improvement
+            round_reward = compute_reward(interactions)
+            print(f"{round_reward:+.1f} ", end="", flush=True)
 
             for ix, ctx in zip(interactions, top_ctxs):
                 reward = ACTION_REWARDS.get(ix["action"], 0.0) / math.log2(ix["position"] + 2)
@@ -314,6 +321,7 @@ class RLEnvironment:
             result.interactions.extend(interactions)
             result.rounds = round_idx + 1
 
+        print("") # newline after trajectory
         result.reward = compute_reward(result.interactions)
         return result
 
@@ -379,34 +387,55 @@ if __name__ == "__main__":
         print(f"Resumed from {args.resume}.npz — starting at session {start_session}")
 
     if args.simulate:
-        policies = _load_policies()[:args.users]
-        total_reward = 0.0
+        policies     = _load_policies()[:args.users]
+        session_rewards: list[float] = []
         sessions_run = 0
 
         for session_num in range(start_session, args.sessions + 1):
             print(f"\n=== Session {session_num}/{args.sessions} ===", flush=True)
+            session_total = 0.0
             for policy in policies:
                 mood      = _random_mood()
                 location  = random.choice(LOCATIONS)
                 timestamp = _now_iso()
                 result    = env.run_session(policy, mood, location, timestamp)
-                total_reward += result.reward
+                session_total += result.reward
                 print(f"  {policy.user_id:35s}  reward={result.reward:+.3f}"
-                      f"  interactions={len(result.interactions)}", flush=True)
+                      f"  rounds={result.rounds}  interactions={len(result.interactions)}",
+                      flush=True)
 
-            updated = slow.run_once()
-            print(f"  [SlowLoop] flushed {updated} user profiles.", flush=True)
+            session_avg = session_total / len(policies)
+            session_rewards.append(session_avg)
             sessions_run += 1
+
+            slow.run_once()
+
+            # convergence summary every 5 sessions
+            if session_num % 5 == 0:
+                window = session_rewards[-5:]
+                print(f"\n  [Convergence] last 5 sessions avg reward: "
+                      f"{sum(window)/len(window):+.3f}  "
+                      f"(was {sum(session_rewards[:5])/len(session_rewards[:5]):+.3f} at start)",
+                      flush=True)
+                # show what bandit has learned: top categories by theta score
+                theta = bandit.A_inv @ bandit.b
+                cat_start = 6 + 7 + 3 + 4   # offset into context vec for category_onehot
+                cat_scores = {CATEGORIES[i]: float(theta[cat_start + i])
+                              for i in range(len(CATEGORIES))}
+                top_cats = sorted(cat_scores.items(), key=lambda x: x[1], reverse=True)[:5]
+                print(f"  [Bandit θ] top categories: "
+                      + "  ".join(f"{c}={v:+.3f}" for c, v in top_cats), flush=True)
 
             if session_num % args.checkpoint_every == 0:
                 ckpt = f"{args.checkpoint_dir}/bandit_session_{session_num}"
                 bandit.save(ckpt)
                 print(f"  [Checkpoint] saved → {ckpt}.npz", flush=True)
 
-        avg = total_reward / (sessions_run * len(policies)) if sessions_run else 0.0
-        print(f"\nAverage reward per session: {avg:+.3f}")
+        overall_avg = sum(session_rewards) / len(session_rewards) if session_rewards else 0.0
+        print(f"\nOverall average reward: {overall_avg:+.3f}")
+        print(f"First 5 sessions avg:   {sum(session_rewards[:5])/5:+.3f}")
+        print(f"Last  5 sessions avg:   {sum(session_rewards[-5:])/5:+.3f}")
         print("Training complete.")
-        # final checkpoint
         final_ckpt = f"{args.checkpoint_dir}/bandit_session_{args.sessions}_final"
         bandit.save(final_ckpt)
         print(f"[Checkpoint] final saved → {final_ckpt}.npz")
