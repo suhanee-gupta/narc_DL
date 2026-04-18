@@ -10,6 +10,7 @@ UCB score:   θᵀ ctx  +  α √(ctxᵀ A⁻¹ ctx)
 A⁻¹ maintained via Sherman-Morrison rank-1 update (O(d²), not O(d³)).
 """
 
+import os
 import numpy as np
 from config import CONTEXT_DIM, BANDIT_ALPHA
 
@@ -50,3 +51,12 @@ class LinUCBBandit:
     def reset(self) -> None:
         self.A_inv = np.eye(self.d, dtype=np.float64)
         self.b     = np.zeros(self.d, dtype=np.float64)
+
+    def save(self, path: str) -> None:
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        np.savez(path, A_inv=self.A_inv, b=self.b)
+
+    def load(self, path: str) -> None:
+        data = np.load(path + ".npz")
+        self.A_inv = data["A_inv"]
+        self.b     = data["b"]

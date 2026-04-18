@@ -319,9 +319,13 @@ def _random_mood() -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--users",    type=int, default=10)
-    parser.add_argument("--sessions", type=int, default=5)
+    parser.add_argument("--simulate",         action="store_true")
+    parser.add_argument("--users",            type=int, default=10)
+    parser.add_argument("--sessions",         type=int, default=5)
+    parser.add_argument("--checkpoint-dir",   type=str, default="checkpoints")
+    parser.add_argument("--checkpoint-every", type=int, default=5)
+    parser.add_argument("--resume",           type=str, default=None,
+                        help="Path to checkpoint .npz (without extension) to resume from")
     args = parser.parse_args()
 
     pipeline = NewsPipeline()
@@ -332,12 +336,23 @@ if __name__ == "__main__":
     slow      = SlowLoop(ctx_store)
     env       = RLEnvironment(pipeline, ctx_store, bandit)
 
+    start_session = 1
+    if args.resume:
+        bandit.load(args.resume)
+        # infer which session to resume from filename e.g. checkpoints/bandit_session_10
+        try:
+            start_session = int(args.resume.split("_session_")[-1]) + 1
+        except ValueError:
+            pass
+        print(f"Resumed from {args.resume}.npz — starting at session {start_session}")
+
     if args.simulate:
         policies = _load_policies()[:args.users]
         total_reward = 0.0
+        sessions_run = 0
 
-        for session_num in range(1, args.sessions + 1):
-            print(f"\n=== Session {session_num}/{args.sessions} ===")
+        for session_num in range(start_session, args.sessions + 1):
+            print(f"\n=== Session {session_num}/{args.sessions} ===", flush=True)
             for policy in policies:
                 mood      = _random_mood()
                 location  = random.choice(LOCATIONS)
@@ -345,12 +360,21 @@ if __name__ == "__main__":
                 result    = env.run_session(policy, mood, location, timestamp)
                 total_reward += result.reward
                 print(f"  {policy.user_id:35s}  reward={result.reward:+.3f}"
-                      f"  interactions={len(result.interactions)}")
+                      f"  interactions={len(result.interactions)}", flush=True)
 
-            # slow loop after each session batch
             updated = slow.run_once()
-            print(f"  [SlowLoop] flushed {updated} user profiles.")
+            print(f"  [SlowLoop] flushed {updated} user profiles.", flush=True)
+            sessions_run += 1
 
-        avg = total_reward / (args.sessions * len(policies))
+            if session_num % args.checkpoint_every == 0:
+                ckpt = f"{args.checkpoint_dir}/bandit_session_{session_num}"
+                bandit.save(ckpt)
+                print(f"  [Checkpoint] saved → {ckpt}.npz", flush=True)
+
+        avg = total_reward / (sessions_run * len(policies)) if sessions_run else 0.0
         print(f"\nAverage reward per session: {avg:+.3f}")
         print("Training complete.")
+        # final checkpoint
+        final_ckpt = f"{args.checkpoint_dir}/bandit_session_{args.sessions}_final"
+        bandit.save(final_ckpt)
+        print(f"[Checkpoint] final saved → {final_ckpt}.npz")
