@@ -1,64 +1,88 @@
-"""
-Reads news_vectors.pkl (produced by news_encoder.py) and news.tsv metadata.
-Assembles Article objects. Does NOT call the encoder or touch raw embeddings.
-"""
-
+import json
 import pickle
-from typing import Optional
+import math
 import numpy as np
-
+from datetime import datetime, timezone
+from typing import Optional
 from user_maker import Article
+from config import FRESHNESS_HALF_LIFE_HOURS
+
+
+def _parse_date(date_str: str) -> Optional[datetime]:
+    for fmt in (
+        "%a, %d %b %Y %H:%M:%S %Z",
+        "%a, %d %b %Y %H:%M:%S %z",
+        "%Y-%m-%dT%H:%M:%SZ",
+        "%Y-%m-%dT%H:%M:%S%z",
+    ):
+        try:
+            dt = datetime.strptime(date_str.strip(), fmt)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt
+        except ValueError:
+            continue
+    return None
+
+
+def _freshness(date_str: str) -> float:
+    dt = _parse_date(date_str)
+    if dt is None:
+        return 0.1
+    now = datetime.now(timezone.utc)
+    age_hours = max((now - dt).total_seconds() / 3600.0, 0.0)
+    return float(math.exp(-age_hours / FRESHNESS_HALF_LIFE_HOURS))
 
 
 class NewsPipeline:
-    def __init__(self, news_tsv: str, news_vectors_pkl: str):
-        self.news_tsv = news_tsv
-        self.news_vectors_pkl = news_vectors_pkl
-        self._store: dict[str, Article] = {}
+    def __init__(self, json_path: str = "google_news_5000.json",
+                 embeddings_pkl: str = "title_embeddings.pkl"):
+        self.json_path = json_path
+        self.embeddings_pkl = embeddings_pkl
+        self._articles: list[Article] = []
+        self._by_id: dict[str, Article] = {}
+        self._embeddings: np.ndarray = np.empty(0)  # shape (N, 768)
+        self._idx_by_id: dict[str, int] = {}
 
     def load(self) -> None:
-        """Load news_vectors.pkl and news.tsv, build the Article store."""
-        with open(self.news_vectors_pkl, "rb") as f:
-            vectors: dict[str, np.ndarray] = pickle.load(f)
+        with open(self.json_path, "r", encoding="utf-8") as f:
+            raw = json.load(f)
 
-        rows: list[list[str]] = []
-        with open(self.news_tsv, "r", encoding="utf-8") as f:
-            for line in f:
-                parts = line.rstrip("\n").split("\t")
-                if len(parts) >= 4:
-                    rows.append(parts)
+        with open(self.embeddings_pkl, "rb") as f:
+            self._embeddings = pickle.load(f).astype(np.float32)  # (4860, 768)
 
-        total = len(rows)
-        self._store = {}
+        self._articles = []
+        self._by_id = {}
+        self._idx_by_id = {}
 
-        for i, row in enumerate(rows):
-            news_id = row[0]
-            if news_id not in vectors:
-                continue
-
-            category = row[1].lower().strip()
-            subcategory = row[2].lower().strip()
-            title = row[3].strip()
-
-            # Freshness proxy: earlier rows = more recent.
-            # Swap to timestamp-based formula once published_at is available:
-            #   freshness = 2 ** (- hours_since_published / FRESHNESS_HALF_LIFE_HOURS)
-            freshness = float(1.0 - i / max(total - 1, 1))
-
-            self._store[news_id] = Article(
-                id=news_id,
-                category=category,
-                subcategory=subcategory,
-                title=title,
-                vec=vectors[news_id].astype(np.float32),
-                freshness=freshness,
+        for i, row in enumerate(raw):
+            sid = str(row["story_id"])
+            article = Article(
+                id=sid,
+                category=row.get("category", ""),
+                subcategory=(row.get("tags") or [""])[0],
+                title=row.get("title", ""),
+                vec=np.zeros(1, dtype=np.float32),   # not used by UserEngine
+                freshness=_freshness(row.get("published_date", "")),
             )
+            self._articles.append(article)
+            self._by_id[sid] = article
+            self._idx_by_id[sid] = i
 
-        print(f"NewsPipeline loaded {len(self._store)} articles.")
+        print(f"NewsPipeline: loaded {len(self._articles)} articles.")
 
     def get_articles(self) -> list[Article]:
-        """All articles sorted freshest-first."""
-        return sorted(self._store.values(), key=lambda a: a.freshness, reverse=True)
+        return self._articles
 
-    def get_article(self, news_id: str) -> Optional[Article]:
-        return self._store.get(news_id)
+    def get_article(self, story_id: str) -> Optional[Article]:
+        return self._by_id.get(str(story_id))
+
+    def get_embedding(self, story_id: str) -> Optional[np.ndarray]:
+        idx = self._idx_by_id.get(str(story_id))
+        if idx is None:
+            return None
+        return self._embeddings[idx]
+
+    def get_all_embeddings(self) -> np.ndarray:
+        """Returns (N, 768) matrix in same order as get_articles()."""
+        return self._embeddings

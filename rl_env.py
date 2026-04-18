@@ -1,35 +1,71 @@
 """
-RLEnvironment — the main engine entry point.
+RLEnvironment — main engine entry point.
 
 Two modes:
+  SIMULATION  python rl_env.py --simulate [--users N] [--sessions N]
+              Uses UserEngine from user_maker.py to simulate behaviour.
+              Updates LinUCB + user_vec on every interaction.
 
-  SIMULATION (testing / offline training)
-      env.run_session(user_id)  →  SessionResult
-      Uses UserEngine from user_maker.py to simulate user behaviour.
-
-  PRODUCTION (real frontend)
-      recs = env.get_recommendations(user_id)   →  list of article dicts
-      env.record_interaction(user_id, news_id, action)
-
-Both modes update the bandit (fast loop) and buffer interactions for the
-slow loop.  The slow loop runs separately via slow_loop.py.
+  PRODUCTION  Import RLEnvironment and call:
+              get_recommendations(user_id, mood, location, timestamp, archetype)
+              record_interaction(user_id, story_id, action, position, session_ctx)
 """
 
 import json
+import math
+import argparse
+import random
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 
 import numpy as np
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-from user_maker import UserPolicy, UserEngine, compute_reward
+from user_maker import UserPolicy, UserEngine, compute_reward, Article
 from news_pipeline import NewsPipeline
 from user_context import UserContextStore
 from bandits import LinUCBBandit
-from recommender import cosine_rank
-from config import TOP_N_CANDIDATES, TOP_K_RECS, FAST_LOOP_ROUNDS
+from slow_loop import SlowLoop
+import user_profile_store as ups
+import context_encoder
+import query_builder
+from config import (
+    TOP_N_CANDIDATES, TOP_K_RECS, FAST_LOOP_ROUNDS,
+    ARCHETYPE_CATEGORY_WEIGHTS, MOOD_MODIFIERS,
+    CATEGORIES, LOCATIONS, EMBED_DIM,
+)
 
-# Immediate per-action reward signal fed to the bandit.
-# Distinct from compute_reward() which is used for overall session evaluation.
-ACTION_REWARDS: dict[str, float] = {
+# ── cross-encoder (bge-reranker) ──────────────────────────────────────────────
+
+_RERANKER_NAME = "BAAI/bge-reranker-base"
+_DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+print("Loading reranker model...")
+_tokenizer = AutoTokenizer.from_pretrained(_RERANKER_NAME)
+_model     = AutoModelForSequenceClassification.from_pretrained(_RERANKER_NAME)
+_model.to(_DEVICE)
+_model.eval()
+print("Reranker ready.\n")
+
+
+@torch.no_grad()
+def score_pairs(query: str, docs: list[str], batch_size: int = 8) -> list[float]:
+    scores = []
+    for i in range(0, len(docs), batch_size):
+        batch  = docs[i: i + batch_size]
+        pairs  = [[query, d] for d in batch]
+        inputs = _tokenizer(pairs, padding=True, truncation=True,
+                            max_length=512, return_tensors="pt")
+        inputs = {k: v.to(_DEVICE) for k, v in inputs.items()}
+        logits = _model(**inputs).logits.view(-1).cpu().tolist()
+        scores.extend(logits)
+    return scores
+
+
+# ── per-action reward ─────────────────────────────────────────────────────────
+
+ACTION_REWARDS = {
     "share":       3.0,
     "dwell_long":  2.0,
     "click":       1.0,
@@ -46,105 +82,207 @@ class SessionResult:
     rounds: int = 0
 
 
-# ── policy loader ─────────────────────────────────────────────────────────────
+# ── helpers ───────────────────────────────────────────────────────────────────
 
-def load_policies(path: str = "user_policies.json") -> dict[str, UserPolicy]:
-    """Deserialise user_policies.json → {user_id: UserPolicy}."""
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return {
-        d["user_id"]: UserPolicy(
-            user_id=d["user_id"],
-            category_weights=d["category_weights"],
-            curiosity=d["curiosity"],
-            patience=d["patience"],
-            recency_bias=d["recency_bias"],
-            position_bias=d["position_bias"],
-            satiation_rate=d["satiation_rate"],
-            session_length=d["session_length"],
-            active_hours=d["active_hours"],
-            mood_volatility=d["mood_volatility"],
-        )
-        for d in data
-    }
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _candidate_pool(articles: list[Article], user_vec: np.ndarray,
+                    embeddings: np.ndarray, archetype: str,
+                    mood: dict) -> list[tuple[Article, int]]:
+    """
+    Returns (article, original_index) pairs, up to TOP_N_CANDIDATES.
+    Cold start → category-weighted sample.
+    Warm       → cosine similarity on user_vec, then mood/freshness re-score.
+    """
+    is_cold = float(np.linalg.norm(user_vec)) < 1e-8
+
+    if not is_cold:
+        # cosine similarity: embeddings are (N,768), user_vec is (768,)
+        u = user_vec.astype(np.float32)
+        u = u / (np.linalg.norm(u) + 1e-8)
+        sims = embeddings @ u                     # (N,)
+        top_idx = np.argpartition(sims, -TOP_N_CANDIDATES)[-TOP_N_CANDIDATES:]
+        top_idx = top_idx[np.argsort(sims[top_idx])[::-1]]
+        pairs = [(articles[i], int(i)) for i in top_idx]
+    else:
+        cat_weights = ARCHETYPE_CATEGORY_WEIGHTS.get(archetype,
+                          {c: 1/24 for c in CATEGORIES})
+        # mood modifiers
+        adjusted = dict(cat_weights)
+        for mood_key, val in mood.items():
+            if val > 0.6 and mood_key in MOOD_MODIFIERS:
+                mod = MOOD_MODIFIERS[mood_key]
+                for c in mod["deprioritize"]:
+                    adjusted[c] = adjusted.get(c, 0.01) * 0.2
+                for c in mod["boost"]:
+                    adjusted[c] = adjusted.get(c, 0.01) * 1.5
+        total = sum(adjusted.values()) or 1.0
+        adjusted = {k: v / total for k, v in adjusted.items()}
+
+        cats  = list(adjusted.keys())
+        probs = [adjusted[c] for c in cats]
+        chosen_cats = random.choices(cats, weights=probs, k=TOP_N_CANDIDATES * 3)
+
+        seen, pairs = set(), []
+        for cat in chosen_cats:
+            if len(pairs) >= TOP_N_CANDIDATES:
+                break
+            candidates = [(a, i) for i, a in enumerate(articles)
+                          if a.category == cat and i not in seen]
+            if candidates:
+                a, idx = random.choice(candidates)
+                seen.add(idx)
+                pairs.append((a, idx))
+
+    # re-score by freshness after cosine
+    pairs.sort(key=lambda t: t[0].freshness, reverse=True)
+    return pairs[:TOP_N_CANDIDATES]
 
 
 # ── main environment ──────────────────────────────────────────────────────────
 
 class RLEnvironment:
-    def __init__(
-        self,
-        policies: dict[str, UserPolicy],
-        news_pipeline: NewsPipeline,
-        context_store: UserContextStore,
-        bandit: LinUCBBandit,
-        top_n: int = TOP_N_CANDIDATES,
-        top_k: int = TOP_K_RECS,
-        fast_loop_rounds: int = FAST_LOOP_ROUNDS,
-    ):
-        self.policies = policies
-        self.pipeline = news_pipeline
-        self.context_store = context_store
-        self.bandit = bandit
-        self.top_n = top_n
-        self.top_k = top_k
-        self.fast_loop_rounds = fast_loop_rounds
+    def __init__(self, pipeline: NewsPipeline, context_store: UserContextStore,
+                 bandit: LinUCBBandit):
+        self.pipeline = pipeline
+        self.ctx      = context_store
+        self.bandit   = bandit
 
-    # ── shared internals ─────────────────────────────────────────────────────
+    # ── production ───────────────────────────────────────────────────────────
 
-    def _candidates(self, user_vec: np.ndarray) -> list:
-        return cosine_rank(user_vec, self.pipeline.get_articles(), top_n=self.top_n)
+    def get_recommendations(self, user_id: str, mood: dict, location: str,
+                            timestamp: str, archetype: str) -> list[dict]:
+        profile  = ups.load(user_id)
+        user_vec = self.ctx.get_vector(user_id)
 
-    def _update_from_interaction(
-        self, user_id: str, user_vec: np.ndarray, ix: dict
-    ) -> None:
-        article = self.pipeline.get_article(ix["article_id"])
+        articles   = self.pipeline.get_articles()
+        embeddings = self.pipeline.get_all_embeddings()
+
+        pairs = _candidate_pool(articles, user_vec, embeddings, archetype, mood)
+
+        # cross-encoder rerank
+        docs   = [f"{a.title}. {a.category}" for a, _ in pairs]
+        query  = query_builder.build(archetype, mood, location, timestamp,
+                                     profile.get("click_history", []))
+        scores = score_pairs(query, docs)
+        ranked = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:20]
+
+        # LinUCB select top-k
+        ctx_vecs   = [context_encoder.build(mood, archetype, location, timestamp,
+                                             a.category, a.freshness, s)
+                      for (a, _), s in ranked]
+        candidates = [a for (a, _), _ in ranked]
+        top_k      = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
+
+        return [
+            {
+                "rank":           i + 1,
+                "story_id":       a.id,
+                "title":          a.title,
+                "category":       a.category,
+                "freshness":      round(a.freshness, 4),
+            }
+            for i, a in enumerate(top_k)
+        ]
+
+    def record_interaction(self, user_id: str, story_id: str, action: str,
+                           position: int, session_ctx: dict) -> None:
+        if action not in ACTION_REWARDS:
+            raise ValueError(f"Unknown action '{action}'")
+        article = self.pipeline.get_article(story_id)
         if article is None:
-            return
-        reward_signal = ACTION_REWARDS.get(ix["action"], 0.0)
-        self.bandit.update(user_vec, article.vec, reward_signal)
-        self.context_store.buffer_interaction({
-            "user_id":    user_id,
-            "article_id": ix["article_id"],
-            "action":     ix["action"],
-            "article_vec": article.vec,
+            raise KeyError(f"Unknown story_id: {story_id}")
+
+        embedding = self.pipeline.get_embedding(story_id)
+
+        ctx    = context_encoder.build(
+            session_ctx["mood"], session_ctx["archetype"],
+            session_ctx["location"], session_ctx["timestamp"],
+            article.category, article.freshness,
+            session_ctx.get("reranker_score", 0.0),
+        )
+        reward = ACTION_REWARDS[action] / math.log2(position + 2)
+
+        # fast loop — LinUCB
+        self.bandit.update(ctx, reward)
+
+        # fast loop — user_vec
+        if embedding is not None:
+            self.ctx.fast_update_user_vec(user_id, embedding, action)
+
+        # buffer for slow loop
+        self.ctx.buffer_interaction({
+            "user_id":           user_id,
+            "story_id":          story_id,
+            "title":             article.title,
+            "category":          article.category,
+            "action":            action,
+            "timestamp":         session_ctx.get("timestamp", _now_iso()),
+            "article_embedding": embedding if embedding is not None
+                                  else np.zeros(EMBED_DIM, dtype=np.float32),
         })
 
-    # ── simulation mode ───────────────────────────────────────────────────────
+    # ── simulation ────────────────────────────────────────────────────────────
 
-    def run_session(self, user_id: str) -> SessionResult:
-        """
-        Fully simulated session for testing / training.
+    def run_session(self, policy: UserPolicy, mood: dict, location: str,
+                    timestamp: str) -> SessionResult:
+        archetype = _policy_archetype(policy)
+        user_id   = policy.user_id
 
-        Flow per session:
-          1. get user_vec (cold = zeros)
-          2. cosine pre-filter → top-N candidates
-          3. for FAST_LOOP_ROUNDS:
-               a. bandit selects top-K from candidates
-               b. UserEngine simulates interaction with the feed
-               c. bandit updated per action
-               d. interactions buffered for slow loop
-        """
-        policy = self.policies.get(user_id)
-        if policy is None:
-            raise KeyError(f"Unknown user_id: '{user_id}'")
+        profile = ups.load(user_id)
+        if profile["archetype"] == "cold_start":
+            profile["archetype"] = archetype
+            ups.save(user_id, profile)
 
-        user_vec = self.context_store.get_vector(user_id)
-        candidates = self._candidates(user_vec)
+        user_vec   = self.ctx.get_vector(user_id)
+        articles   = self.pipeline.get_articles()
+        embeddings = self.pipeline.get_all_embeddings()
+
+        pairs = _candidate_pool(articles, user_vec, embeddings, archetype, mood)
+
+        docs   = [f"{a.title}. {a.category}" for a, _ in pairs]
+        query  = query_builder.build(archetype, mood, location, timestamp,
+                                     profile.get("click_history", []))
+        scores = score_pairs(query, docs)
+        ranked = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:20]
+
+        ctx_vecs   = [context_encoder.build(mood, archetype, location, timestamp,
+                                             a.category, a.freshness, s)
+                      for (a, _), s in ranked]
+        candidates = [a for (a, _), _ in ranked]
 
         engine = UserEngine(policy)
-        state = engine.start_session()
+        state  = engine.start_session()
         result = SessionResult(user_id=user_id)
 
-        for round_idx in range(self.fast_loop_rounds):
-            top_k = self.bandit.select_topk(user_vec, candidates, self.top_k)
+        for round_idx in range(FAST_LOOP_ROUNDS):
+            top_k = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
+            top_ctxs = [ctx_vecs[candidates.index(a)] for a in top_k]
 
             interactions, state = engine.interact_with_feed(top_k, state)
             if not interactions:
                 break
 
-            for ix in interactions:
-                self._update_from_interaction(user_id, user_vec, ix)
+            for ix, ctx in zip(interactions, top_ctxs):
+                reward = ACTION_REWARDS.get(ix["action"], 0.0) / math.log2(ix["position"] + 2)
+                self.bandit.update(ctx, reward)
+
+                emb = self.pipeline.get_embedding(ix["article_id"])
+                if emb is not None:
+                    self.ctx.fast_update_user_vec(user_id, emb, ix["action"])
+
+                self.ctx.buffer_interaction({
+                    "user_id":           user_id,
+                    "story_id":          ix["article_id"],
+                    "title":             "",
+                    "category":          ix["category"],
+                    "action":            ix["action"],
+                    "timestamp":         timestamp,
+                    "article_embedding": emb if emb is not None
+                                          else np.zeros(EMBED_DIM, dtype=np.float32),
+                })
 
             result.interactions.extend(interactions)
             result.rounds = round_idx + 1
@@ -152,69 +290,67 @@ class RLEnvironment:
         result.reward = compute_reward(result.interactions)
         return result
 
-    def run_batch(self, user_ids: list[str]) -> list[SessionResult]:
-        return [self.run_session(uid) for uid in user_ids]
 
-    # ── production mode ───────────────────────────────────────────────────────
+def _policy_archetype(policy: UserPolicy) -> str:
+    top_cat = max(policy.category_weights, key=policy.category_weights.get)
+    mapping = {
+        "sports": "sports_fan", "health": "wellness",
+        "finance": "finance_biz", "tech": "sci_tech",
+        "world": "world_watcher", "politics": "world_watcher",
+        "science": "sci_tech", "entertainment": "foodie_lifestyle",
+    }
+    return mapping.get(top_cat.lower(), "cold_start")
 
-    def get_recommendations(self, user_id: str) -> list[dict]:
-        """
-        Returns top-K ranked article recommendations for the given user.
 
-        Call this when the frontend requests a feed.
-        Does NOT update the bandit or buffer — those happen in record_interaction().
+# ── CLI ───────────────────────────────────────────────────────────────────────
 
-        Response schema (list of dicts):
-            news_id     : str
-            category    : str
-            subcategory : str
-            title       : str
-            freshness   : float  (0–1)
-        """
-        user_vec = self.context_store.get_vector(user_id)
-        candidates = self._candidates(user_vec)
-        top_k = self.bandit.select_topk(user_vec, candidates, self.top_k)
-        return [
-            {
-                "news_id":     a.id,
-                "category":    a.category,
-                "subcategory": a.subcategory,
-                "title":       a.title,
-                "freshness":   round(a.freshness, 4),
-            }
-            for a in top_k
-        ]
+def _load_policies(path: str = "user_policies.json") -> list[UserPolicy]:
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return [UserPolicy(**{k: v for k, v in d.items()}) for d in data]
 
-    def record_interaction(
-        self, user_id: str, news_id: str, action: str
-    ) -> None:
-        """
-        Record a real user action from the frontend.
 
-        Immediately updates the bandit (fast loop).
-        Buffers the interaction for the next slow-loop context update.
+def _random_mood() -> dict:
+    keys = ["happy", "sad", "angry", "anxious", "calm", "curious"]
+    raw  = {k: random.random() for k in keys}
+    total = sum(raw.values())
+    return {k: round(v / total, 3) for k, v in raw.items()}
 
-        Parameters
-        ----------
-        user_id : str   — must be a known user (in policies dict)
-        news_id : str   — must be a known article (in news_pipeline)
-        action  : str   — one of: click, skip, dwell_short, dwell_long, share
-        """
-        if action not in ACTION_REWARDS:
-            raise ValueError(
-                f"Unknown action '{action}'. "
-                f"Valid: {list(ACTION_REWARDS.keys())}"
-            )
-        article = self.pipeline.get_article(news_id)
-        if article is None:
-            raise KeyError(f"Unknown news_id: '{news_id}'")
 
-        user_vec = self.context_store.get_vector(user_id)
-        reward_signal = ACTION_REWARDS[action]
-        self.bandit.update(user_vec, article.vec, reward_signal)
-        self.context_store.buffer_interaction({
-            "user_id":    user_id,
-            "article_id": news_id,
-            "action":     action,
-            "article_vec": article.vec,
-        })
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--users",    type=int, default=10)
+    parser.add_argument("--sessions", type=int, default=5)
+    args = parser.parse_args()
+
+    pipeline = NewsPipeline()
+    pipeline.load()
+
+    ctx_store = UserContextStore()
+    bandit    = LinUCBBandit()
+    slow      = SlowLoop(ctx_store)
+    env       = RLEnvironment(pipeline, ctx_store, bandit)
+
+    if args.simulate:
+        policies = _load_policies()[:args.users]
+        total_reward = 0.0
+
+        for session_num in range(1, args.sessions + 1):
+            print(f"\n=== Session {session_num}/{args.sessions} ===")
+            for policy in policies:
+                mood      = _random_mood()
+                location  = random.choice(LOCATIONS)
+                timestamp = _now_iso()
+                result    = env.run_session(policy, mood, location, timestamp)
+                total_reward += result.reward
+                print(f"  {policy.user_id:35s}  reward={result.reward:+.3f}"
+                      f"  interactions={len(result.interactions)}")
+
+            # slow loop after each session batch
+            updated = slow.run_once()
+            print(f"  [SlowLoop] flushed {updated} user profiles.")
+
+        avg = total_reward / (args.sessions * len(policies))
+        print(f"\nAverage reward per session: {avg:+.3f}")
+        print("Training complete.")
