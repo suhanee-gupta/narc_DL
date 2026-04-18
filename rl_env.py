@@ -295,9 +295,17 @@ class RLEnvironment:
                 print(" [Session End]", end="")
                 break
 
-            # Track reward for THIS specific round to see improvement
-            round_reward = compute_reward(interactions)
-            print(f"{round_reward:+.1f} ", end="", flush=True)
+            # Detailed reward breakdown and 'repeaking' check
+            r_reward = compute_reward(interactions)
+            acts = {"c": 0, "s": 0, "h": 0} # clicks, skips, shares/dwell_long
+            for ix in interactions:
+                if ix["action"] == "skip": acts["s"] += 1
+                elif ix["action"] in ["share", "dwell_long"]: acts["h"] += 1
+                else: acts["c"] += 1
+            
+            # ID Fingerprint: Last 4 chars of top 2 recs
+            fingerprint = [str(a.id)[-4:] for a in top_k[:2]]
+            print(f"|{r_reward:+.1f} {acts} {fingerprint}| ", end="", flush=True)
 
             for ix, ctx in zip(interactions, top_ctxs):
                 reward = ACTION_REWARDS.get(ix["action"], 0.0) / math.log2(ix["position"] + 2)

@@ -274,7 +274,7 @@ def compute_reward(interactions: List[Dict]) -> float:
     if not interactions:
         return -0.5  # user didn't interact at all = bad ranking
     
-    reward = 0.0
+    action_reward = 0.0
     n = len(interactions)
     
     action_values = {
@@ -290,7 +290,7 @@ def compute_reward(interactions: List[Dict]) -> float:
         
         # position discount: reward is worth more if good action happened early
         position_discount = 1.0 / np.log2(interaction['position'] + 2)
-        reward += action_val * position_discount
+        action_reward += action_val * position_discount
     
     # diversity bonus: entropy over categories interacted with
     cats = [i['category'] for i in interactions]
@@ -301,13 +301,17 @@ def compute_reward(interactions: List[Dict]) -> float:
     diversity_bonus = 0.4 * (entropy / max_entropy)
     
     # mood trajectory bonus: did mood improve during session?
+    mood_bonus = 0.0
     if len(interactions) > 1:
         mood_start = interactions[0]['mood_before']
         mood_end = interactions[-1]['mood_before']
         mood_bonus = 0.3 * (mood_end - mood_start)
-        reward += mood_bonus
+
+    reward = action_reward + diversity_bonus + mood_bonus
     
-    reward += diversity_bonus
+    # Debug line to see component contribution
+    # print(f" [Act:{action_reward:+.2f} Div:{diversity_bonus:+.2f} Mood:{mood_bonus:+.2f}]", end="")
+
     return float(reward)
 
 
