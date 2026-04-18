@@ -35,6 +35,7 @@ class ContextObject:
         user_id: str,
         mood: str,
         location: str,
+        top_k: int,
         time_of_day: str,              # e.g. "morning", "evening"
         history: List[str],            # Last N article IDs (most-recent first)
         explicit_ratings: dict | None = None,   # {article_id: 1-5}
@@ -42,6 +43,7 @@ class ContextObject:
     ):
         self.user_id = user_id
         self.mood = mood
+        self.top_k = top_k
         self.time_of_day = time_of_day
         self.location = location
         self.history = history
@@ -98,7 +100,7 @@ class BaseRetriever(ABC):
     """
 
     @abstractmethod
-    def retrieve(self, user_vector: np.ndarray, top_k: int) -> List[str]:
+    def retrieve(self, context: ContextObject) -> List[str]:
         """
         Parameters
         ----------
@@ -111,11 +113,6 @@ class BaseRetriever(ABC):
         List[str]
             Article IDs sorted by cosine similarity (closest first).
         """
-        ...
-
-    @abstractmethod
-    def add_articles(self, article_ids: List[str], vectors: np.ndarray) -> None:
-        """Bulk-insert new articles into the index."""
         ...
 
 
@@ -206,4 +203,16 @@ class BaseFeedbackStore(ABC):
     @abstractmethod
     async def get_dwell_times(self, user_id: str) -> dict:
         """Return {article_id: seconds_spent} for recently viewed items."""
+        ...
+    
+    @abstractmethod
+    async def log_dwell(self, user_id: str, article_id: str, seconds: float) -> None:
+        ...
+    
+    @abstractmethod
+    async def log_candidates(self, user_id: str, article_ids: List[str]) -> None:
+        ...
+    
+    @abstractmethod
+    async def get_last_candidates(self, user_id: str) -> List[str]:
         ...

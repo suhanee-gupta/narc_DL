@@ -18,6 +18,7 @@ import logging
 import os
 import pickle
 from typing import Optional
+import pandas as pd
 
 from app.core.config import settings
 from app.core.interfaces import BaseEncoder, BaseRetriever, BaseBandit, BaseFeedbackStore
@@ -27,7 +28,7 @@ logger = logging.getLogger("registry")
  
 class ArtifactRegistry:
     """Singleton registry — one per process."""
-
+ 
     _instance: Optional["ArtifactRegistry"] = None
 
     # ── Public accessors ─────────────────────────────────────────────────────
@@ -65,30 +66,31 @@ class ArtifactRegistry:
     # ── Internal loaders (each tries real artifact first, falls back to stub) ─
 
     def _load_metadata(self) -> None:
-        if os.path.exists(settings.METADATA_PATH):
-            with open(settings.METADATA_PATH) as f:
-                article_list = json.load(f)
-            
-            self.metadata = {str(item["story_id"]): item for item in article_list}
-            logger.info("Loaded metadata: %d articles", len(self.metadata))
-        else:
-            logger.warning(
-                "metadata.json not found at %s — generating mock catalog (%d items).",
-                settings.METADATA_PATH,
-                settings.MOCK_CATALOG_SIZE,
-            )
-            self.metadata = _generate_mock_metadata(settings.MOCK_CATALOG_SIZE)
+        with open(settings.METADATA_PATH) as f:
+            article_list = json.load(f)
+        
+        self.metadata = {str(item["story_id"]): item for item in article_list}
+        logger.info("Loaded metadata: %d articles", len(self.metadata))
 
     def _load_retriever(self) -> None:
-        if os.path.exists(settings.FAISS_INDEX_PATH):
-            # ── Real path: swap in FAISSRetriever once implemented ────────────
-            # from app.services.retriever_faiss import FAISSRetriever
-            # self.retriever = FAISSRetriever(settings.FAISS_INDEX_PATH, settings.EMBEDDING_DIM)
-            logger.info("FAISS index found — using FAISSRetriever (stub for now).")
-            self.retriever = _build_stub_retriever(list(self.metadata.keys()))
-        else:
-            logger.warning("No FAISS index found — using RandomRetriever stub.")
-            self.retriever = _build_stub_retriever(list(self.metadata.keys()))
+        # ── Real path: swap in FAISSRetriever once implemented ────────────
+        from app.services.retriever_transformer import TransformerRetriever
+        from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+        metadata_list = list(self.metadata.values())
+        df = pd.DataFrame(metadata_list)
+        df["story_id_str"] = df["story_id"].astype(str)
+
+        df["article_text"] = (
+        "Title: " + df["title"].astype(str) + 
+        " Summary: " + df["summary"].astype(str)
+    )
+
+        tokenizer = AutoTokenizer.from_pretrained(settings.MODEL_NAME)
+        model = AutoModelForSequenceClassification.from_pretrained(settings.MODEL_NAME).to(settings.DEVICE)
+        self.retriever = TransformerRetriever(df, model, tokenizer)
+        logger.info("FAISS index found — using FAISSRetriever (stub for now).")
+        # self.retriever = _build_stub_retriever(list(self.metadata.keys()))
 
     def _load_encoder(self) -> None:
         # ── Real path example (uncomment when ready): ─────────────────────────

@@ -3,12 +3,14 @@ CONTEXT_DIM = 46
 
 TOP_N_CANDIDATES = 200
 TOP_K_RECS = 10
-FAST_LOOP_ROUNDS = 3
-BANDIT_ALPHA = 0.5
+FAST_LOOP_ROUNDS = 50        # As requested: 50 fast loops per session
+SLOW_LOOP_FLUSH_EVERY = 2    # As requested: 50 rounds / 2 = 25 flushes (approx 20)
+RERANK_REFRESH_EVERY = 1     # Refresh more often in simulation to see the loop react
+BANDIT_ALPHA = 0.2           # TRICK: Lower alpha = faster exploitation (quicker convergence)
 
 SLOW_LOOP_INTERVAL_SEC = 3600
-SLOW_LOOP_LR = 0.1
-FAST_LOOP_USER_VEC_LR = 0.3      # how fast user_vec shifts per positive interaction
+SLOW_LOOP_LR = 0.4               # aggressive slow loop update for demo
+FAST_LOOP_USER_VEC_LR = 0.7      # user_vec shifts strongly after 2-3 interactions
 
 FRESHNESS_HALF_LIFE_HOURS = 24.0
 

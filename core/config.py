@@ -6,7 +6,7 @@ All values can be overridden via environment variables.
 import os
 from dataclasses import dataclass, field
 from typing import Optional
-
+import torch
 
 @dataclass
 class Config:
@@ -20,7 +20,7 @@ class Config:
 
     # ── Retrieval ───────────────────────────────────────────────────────────
     # Number of candidate articles returned by FAISS before RL re-ranking.
-    RETRIEVAL_TOP_K: int = int(os.getenv("RETRIEVAL_TOP_K", "200"))
+    RETRIEVAL_TOP_K: int = int(os.getenv("RETRIEVAL_TOP_K", "100"))
 
     # Final recommendations shown to the user.
     FINAL_TOP_N: int = int(os.getenv("FINAL_TOP_N", "15"))
@@ -32,8 +32,11 @@ class Config:
     # ── Artifacts paths ─────────────────────────────────────────────────────
     ARTIFACTS_DIR: str = os.getenv("ARTIFACTS_DIR", "artifacts")
     FAISS_INDEX_PATH: str = os.getenv("FAISS_INDEX_PATH", "artifacts/catalog.index")
-    METADATA_PATH: str = os.getenv("METADATA_PATH", "artifacts/metadata.json")
+    METADATA_PATH: str = os.getenv("METADATA_PATH", "data/google_news_5000.json")
     BANDIT_WEIGHTS_PATH: str = os.getenv("BANDIT_WEIGHTS_PATH", "artifacts/bandit_weights.pkl")
+    JSON_PATH  = "../data/google_news_5000.json"
+    MODEL_NAME = "BAAI/bge-reranker-base"
+    DEVICE     = "cuda" if torch.cuda.is_available() else "cpu"
 
     # ── Catalog size (used for mock generation when no FAISS index exists) ──
     MOCK_CATALOG_SIZE: int = int(os.getenv("MOCK_CATALOG_SIZE", "1000"))

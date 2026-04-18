@@ -32,6 +32,7 @@ import context_encoder
 import query_builder
 from config import (
     TOP_N_CANDIDATES, TOP_K_RECS, FAST_LOOP_ROUNDS,
+    SLOW_LOOP_FLUSH_EVERY, RERANK_REFRESH_EVERY,
     ARCHETYPE_CATEGORY_WEIGHTS, MOOD_MODIFIERS,
     CATEGORIES, LOCATIONS, EMBED_DIM,
 )
@@ -178,7 +179,7 @@ class RLEnvironment:
                         seen.add(i)
 
         # cross-encoder rerank
-        docs   = [f"{a.title}. {a.category}" for a, _ in pairs]
+        docs   = [f"{a.title}. {a.summary}" for a, _ in pairs]
         query  = query_builder.build(archetype, mood, location, timestamp,
                                      profile.get("click_history", []))
         scores = score_pairs(query, docs)
@@ -230,7 +231,7 @@ class RLEnvironment:
         if embedding is not None:
             self.ctx.fast_update_user_vec(user_id, embedding, action)
 
-        # buffer for slow loop
+        # buffer + immediate flush so click_history updates before next recommendation
         self.ctx.buffer_interaction({
             "user_id":           user_id,
             "story_id":          story_id,
@@ -241,6 +242,7 @@ class RLEnvironment:
             "article_embedding": embedding if embedding is not None
                                   else np.zeros(EMBED_DIM, dtype=np.float32),
         })
+        self.ctx.flush_updates()   # write click_history to disk immediately
 
     # ── simulation ────────────────────────────────────────────────────────────
 
@@ -249,39 +251,89 @@ class RLEnvironment:
         archetype = _policy_archetype(policy)
         user_id   = policy.user_id
 
-        profile = ups.load(user_id)
+        profile  = ups.load(user_id)
         if profile["archetype"] == "cold_start":
             profile["archetype"] = archetype
             ups.save(user_id, profile)
 
-        user_vec   = self.ctx.get_vector(user_id)
         articles   = self.pipeline.get_articles()
         embeddings = self.pipeline.get_all_embeddings()
 
-        pairs = _candidate_pool(articles, user_vec, embeddings, archetype, mood)
+        _POSITIVE_ACTIONS = {"share", "dwell_long", "click"}
 
-        docs   = [f"{a.title}. {a.category}" for a, _ in pairs]
-        query  = query_builder.build(archetype, mood, location, timestamp,
-                                     profile.get("click_history", []))
-        scores = score_pairs(query, docs)
-        ranked = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:20]
+        def _build_candidates(session_interactions: list):
+            """Re-run candidate pool + reranker using current user_vec and
+            in-session positive clicks appended to click_history."""
+            uv     = self.ctx.get_vector(user_id)
+            pairs  = _candidate_pool(articles, uv, embeddings, archetype, mood)
+            # include in-session positive clicks in query so reranker adapts
+            session_pos = [
+                {"title": self.pipeline.get_article(ix["article_id"]).title or ""}
+                for ix in session_interactions
+                if ix["action"] in _POSITIVE_ACTIONS
+                and self.pipeline.get_article(ix["article_id"]) is not None
+            ]
+            q = query_builder.build(
+                archetype, mood, location, timestamp,
+                profile.get("click_history", []) + session_pos,
+            )
+            docs    = [f"{a.title}. {a.summary}" for a, _ in pairs]
+            scores  = score_pairs(q, docs)
+            ranked  = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:20]
+            cvecs   = [context_encoder.build(mood, archetype, location, timestamp,
+                                              a.category, a.freshness, s)
+                       for (a, _), s in ranked]
+            cands   = [a for (a, _), _ in ranked]
+            return cvecs, cands
 
-        ctx_vecs   = [context_encoder.build(mood, archetype, location, timestamp,
-                                             a.category, a.freshness, s)
-                      for (a, _), s in ranked]
-        candidates = [a for (a, _), _ in ranked]
+        ctx_vecs, candidates = _build_candidates([])
 
         engine = UserEngine(policy)
-        state  = engine.start_session()
         result = SessionResult(user_id=user_id)
+        seen_ids = set()
 
+        print(f"    Learning Trajectory (User {user_id[:8]}...): ", end="", flush=True)
         for round_idx in range(FAST_LOOP_ROUNDS):
-            top_k = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
-            top_ctxs = [ctx_vecs[candidates.index(a)] for a in top_k]
+            # slow loop flush — stable user_vec update every N rounds
+            if round_idx > 0 and round_idx % SLOW_LOOP_FLUSH_EVERY == 0:
+                self.ctx.flush_updates()
 
-            interactions, state = engine.interact_with_feed(top_k, state)
+            # refresh reranker every N rounds using in-session clicks
+            # Also refresh if the last round was a total failure (reward < 0)
+            if round_idx > 0 and (round_idx % RERANK_REFRESH_EVERY == 0):
+                profile = ups.load(user_id)
+                ctx_vecs, candidates = _build_candidates(result.interactions)
+
+            top_k    = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
+            # FILTER: Remove articles already seen in this session to prevent 'repeaking'
+            fresh_indices = [i for i, a in enumerate(candidates) if a.id not in seen_ids]
+            f_ctx = [ctx_vecs[i] for i in fresh_indices]
+            f_cand = [candidates[i] for i in fresh_indices]
+
+            top_k    = self.bandit.select_topk(f_ctx, f_cand, TOP_K_RECS)
+            top_ctxs = [ctx_vecs[candidates.index(a)] for a in top_k]
+            for a in top_k: seen_ids.add(a.id)
+
+            # fresh state each round — session_length applies per round, not total
+            state = engine.start_session()
+            interactions, _ = engine.interact_with_feed(top_k, state)
             if not interactions:
+                print(" [Session End]", end="")
                 break
+
+            # Detailed reward breakdown and 'repeaking' check
+            # Detailed reward breakdown: c=click, s=skip, h=high-engagement, d=dwell_short
+            r_reward = compute_reward(interactions)
+            acts = {"c": 0, "s": 0, "h": 0, "d": 0}
+            for ix in interactions:
+                if ix["action"] == "skip": acts["s"] += 1
+                elif ix["action"] in ["share", "dwell_long"]: acts["h"] += 1
+                elif ix["action"] == "click": acts["c"] += 1
+                elif ix["action"] == "dwell_short": acts["d"] += 1
+            
+            # ID Fingerprint: Last 4 chars of top 2 recs
+            fingerprint = [str(a.id)[-4:] for a in top_k[:2]]
+            print(f"|{r_reward:+.1f} {acts} {fingerprint}| ", end="", flush=True)
 
             for ix, ctx in zip(interactions, top_ctxs):
                 reward = ACTION_REWARDS.get(ix["action"], 0.0) / math.log2(ix["position"] + 2)
@@ -306,6 +358,7 @@ class RLEnvironment:
             result.interactions.extend(interactions)
             result.rounds = round_idx + 1
 
+        print("") # newline after trajectory
         result.reward = compute_reward(result.interactions)
         return result
 
@@ -344,7 +397,7 @@ def _random_mood() -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate",         action="store_true")
-    parser.add_argument("--users",            type=int, default=10)
+    parser.add_argument("--users",            type=int, default=100)
     parser.add_argument("--sessions",         type=int, default=5)
     parser.add_argument("--checkpoint-dir",   type=str, default="checkpoints")
     parser.add_argument("--checkpoint-every", type=int, default=5)
@@ -371,34 +424,55 @@ if __name__ == "__main__":
         print(f"Resumed from {args.resume}.npz — starting at session {start_session}")
 
     if args.simulate:
-        policies = _load_policies()[:args.users]
-        total_reward = 0.0
+        policies     = _load_policies()[:args.users]
+        session_rewards: list[float] = []
         sessions_run = 0
 
         for session_num in range(start_session, args.sessions + 1):
             print(f"\n=== Session {session_num}/{args.sessions} ===", flush=True)
+            session_total = 0.0
             for policy in policies:
                 mood      = _random_mood()
                 location  = random.choice(LOCATIONS)
                 timestamp = _now_iso()
                 result    = env.run_session(policy, mood, location, timestamp)
-                total_reward += result.reward
+                session_total += result.reward
                 print(f"  {policy.user_id:35s}  reward={result.reward:+.3f}"
-                      f"  interactions={len(result.interactions)}", flush=True)
+                      f"  rounds={result.rounds}  interactions={len(result.interactions)}",
+                      flush=True)
 
-            updated = slow.run_once()
-            print(f"  [SlowLoop] flushed {updated} user profiles.", flush=True)
+            session_avg = session_total / len(policies)
+            session_rewards.append(session_avg)
             sessions_run += 1
+
+            slow.run_once()
+
+            # convergence summary every 5 sessions
+            if session_num % 5 == 0:
+                window = session_rewards[-5:]
+                print(f"\n  [Convergence] last 5 sessions avg reward: "
+                      f"{sum(window)/len(window):+.3f}  "
+                      f"(was {sum(session_rewards[:5])/len(session_rewards[:5]):+.3f} at start)",
+                      flush=True)
+                # show what bandit has learned: top categories by theta score
+                theta = bandit.A_inv @ bandit.b
+                cat_start = 6 + 7 + 3 + 4   # offset into context vec for category_onehot
+                cat_scores = {CATEGORIES[i]: float(theta[cat_start + i])
+                              for i in range(len(CATEGORIES))}
+                top_cats = sorted(cat_scores.items(), key=lambda x: x[1], reverse=True)[:5]
+                print(f"  [Bandit θ] top categories: "
+                      + "  ".join(f"{c}={v:+.3f}" for c, v in top_cats), flush=True)
 
             if session_num % args.checkpoint_every == 0:
                 ckpt = f"{args.checkpoint_dir}/bandit_session_{session_num}"
                 bandit.save(ckpt)
                 print(f"  [Checkpoint] saved → {ckpt}.npz", flush=True)
 
-        avg = total_reward / (sessions_run * len(policies)) if sessions_run else 0.0
-        print(f"\nAverage reward per session: {avg:+.3f}")
+        overall_avg = sum(session_rewards) / len(session_rewards) if session_rewards else 0.0
+        print(f"\nOverall average reward: {overall_avg:+.3f}")
+        print(f"First 5 sessions avg:   {sum(session_rewards[:5])/5:+.3f}")
+        print(f"Last  5 sessions avg:   {sum(session_rewards[-5:])/5:+.3f}")
         print("Training complete.")
-        # final checkpoint
         final_ckpt = f"{args.checkpoint_dir}/bandit_session_{args.sessions}_final"
         bandit.save(final_ckpt)
         print(f"[Checkpoint] final saved → {final_ckpt}.npz")
