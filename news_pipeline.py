@@ -41,6 +41,7 @@ class NewsPipeline:
         self.embeddings_pkl = embeddings_pkl
         self._articles: list[Article] = []
         self._by_id: dict[str, Article] = {}
+        self._raw: dict[str, dict] = {}              # extra fields per story_id
         self._embeddings: np.ndarray = np.empty(0)  # shape (N, 768)
         self._idx_by_id: dict[str, int] = {}
 
@@ -53,6 +54,7 @@ class NewsPipeline:
 
         self._articles = []
         self._by_id = {}
+        self._raw = {}
         self._idx_by_id = {}
 
         for i, row in enumerate(raw):
@@ -68,6 +70,13 @@ class NewsPipeline:
             self._articles.append(article)
             self._by_id[sid] = article
             self._idx_by_id[sid] = i
+            self._raw[sid] = {
+                "summary":        row.get("summary", ""),
+                "publisher":      row.get("publisher", ""),
+                "published_date": row.get("published_date", ""),
+                "canonical_url":  row.get("canonical_url", ""),
+                "tags":           row.get("tags", []),
+            }
 
         print(f"NewsPipeline: loaded {len(self._articles)} articles.")
 
@@ -86,3 +95,7 @@ class NewsPipeline:
     def get_all_embeddings(self) -> np.ndarray:
         """Returns (N, 768) matrix in same order as get_articles()."""
         return self._embeddings
+
+    def get_raw(self, story_id: str) -> dict:
+        """Extra fields (summary, publisher, etc.) for frontend display."""
+        return self._raw.get(str(story_id), {})

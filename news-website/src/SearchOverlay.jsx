@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, X, Clock, TrendingUp, ArrowRight } from 'lucide-react';
-import { CORPUS } from './engine.jsx';
+import { searchArticles } from './api.js';
+import { mapBackendToFrontend } from './engine.jsx';
 
 export default function SearchOverlay({ open, onClose, onSelectArticle }) {
   const [query, setQuery] = useState("");
@@ -20,15 +21,25 @@ export default function SearchOverlay({ open, onClose, onSelectArticle }) {
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
-  const suggestions = useMemo(() => {
-    if (!query || query.length < 2) return [];
-    const q = query.toLowerCase();
-    return CORPUS
-      .filter(a => a.headline?.toLowerCase().includes(q) || a.topic?.toLowerCase().includes(q) || a.author?.toLowerCase().includes(q))
-      .slice(0, 8);
+  const [suggestions, setSuggestions] = useState([]);
+  
+  useEffect(() => {
+    if (!query || query.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    const t = setTimeout(async () => {
+      try {
+        const res = await searchArticles(query);
+        setSuggestions(res.results.map(mapBackendToFrontend));
+      } catch (e) {
+        console.error("Search failed", e);
+      }
+    }, 300);
+    return () => clearTimeout(t);
   }, [query]);
 
-  const trendingTopics = ["Tech", "Finance", "Geopolitics", "Health", "Culture", "Lifestyle"];
+  const trendingTopics = ["AI", "Technology", "Finance", "Sports", "Politics", "Health", "Entertainment", "World", "Science", "Cricket"];
 
   const handleSelect = (article) => {
     onSelectArticle(article);

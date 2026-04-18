@@ -153,7 +153,7 @@ class RLEnvironment:
     # ── production ───────────────────────────────────────────────────────────
 
     def get_recommendations(self, user_id: str, mood: dict, location: str,
-                            timestamp: str, archetype: str) -> list[dict]:
+                            timestamp: str, archetype: str, category: str = None) -> list[dict]:
         profile  = ups.load(user_id)
         user_vec = self.ctx.get_vector(user_id)
 
@@ -162,19 +162,36 @@ class RLEnvironment:
 
         pairs = _candidate_pool(articles, user_vec, embeddings, archetype, mood)
 
+        # Apply hard category filter if requested by the user from the navbar
+        if category and category != "Home":
+            pairs = [(a, i) for (a, i) in pairs if a.category == category]
+            # fallback if too few candidates: fetch purely by category
+            if len(pairs) < 15:
+                cat_candidates = [(a, i) for i, a in enumerate(articles) if a.category == category]
+                # Sort by freshness to get top recent
+                cat_candidates.sort(key=lambda x: x[0].freshness, reverse=True)
+                seen = {idx for _, idx in pairs}
+                for a, i in cat_candidates:
+                    if len(pairs) >= TOP_N_CANDIDATES: break
+                    if i not in seen:
+                        pairs.append((a, i))
+                        seen.add(i)
+
         # cross-encoder rerank
         docs   = [f"{a.title}. {a.category}" for a, _ in pairs]
         query  = query_builder.build(archetype, mood, location, timestamp,
                                      profile.get("click_history", []))
         scores = score_pairs(query, docs)
-        ranked = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:20]
+        ranked = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:60]
 
         # LinUCB select top-k
         ctx_vecs   = [context_encoder.build(mood, archetype, location, timestamp,
                                              a.category, a.freshness, s)
                       for (a, _), s in ranked]
         candidates = [a for (a, _), _ in ranked]
-        top_k      = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
+        
+        # Increase backend return count to 30 so frontend grid (15 slots) never runs sparse
+        top_k      = self.bandit.select_topk(ctx_vecs, candidates, 30)
 
         return [
             {
@@ -183,6 +200,7 @@ class RLEnvironment:
                 "title":          a.title,
                 "category":       a.category,
                 "freshness":      round(a.freshness, 4),
+                **self.pipeline.get_raw(a.id),
             }
             for i, a in enumerate(top_k)
         ]

@@ -4,13 +4,14 @@ import PersonalizationDrawer from "./PersonalizationDrawer.jsx";
 import AnalyticsDrawer from "./AnalyticsDrawer.jsx";
 import BookmarksDrawer from "./BookmarksDrawer.jsx";
 import SearchOverlay from "./SearchOverlay.jsx";
-import { NewsOnboarding, defaultMoodVector } from "./newsroom-onboarding.jsx";
+import { BACKEND_ARCHETYPES, NewsOnboarding, defaultMoodVector } from "./newsroom-onboarding.jsx";
 import {
   NewsTopBar, NewsMasthead, NewsNav,
   NewsHero, NewsSection, NewsCard, NewsFooter,
   NewsImg, MatchChip
 } from "./newsroom-content.jsx";
-import { getRankedNews, PROFILES, CORPUS, scoreArticle, buildAffinity } from "./engine.jsx";
+import { TOPICS, mapBackendToFrontend } from "./engine.jsx";
+import { startSession, fetchRecommendations } from "./api.js";
 
 
 
@@ -24,14 +25,27 @@ export default function NewsroomApp() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
   const [reranking, setReranking] = useState(false);
+  const [ranked, setRanked] = useState([]);
+  const [latencySec, setLatencySec] = useState(0);
+  const [sessionId, setSessionId] = useState(null);
+
+  const userId = useMemo(() => {
+    let id = localStorage.getItem("margin_uid");
+    if (!id) {
+      id = "user_" + Math.random().toString(36).substring(2, 10);
+      localStorage.setItem("margin_uid", id);
+    }
+    return id;
+  }, []);
+
   const [ctx, setCtx] = useState(() => {
     try {
       const stored = localStorage.getItem("margin_ctx");
       return stored ? JSON.parse(stored) : { 
-        profile: "casual", timeContext: "morning", env: "", region: "Global", moodVector: defaultMoodVector() 
+        profile: "cold_start", timeContext: "morning", env: "", region: "Global", moodVector: defaultMoodVector() 
       };
     } catch {
-      return { profile: "casual", timeContext: "morning", env: "", region: "Global", moodVector: defaultMoodVector() };
+      return { profile: "cold_start", timeContext: "morning", env: "", region: "Global", moodVector: defaultMoodVector() };
     }
   });
 
@@ -44,28 +58,40 @@ export default function NewsroomApp() {
 
   console.log("NewsroomApp rendering. drawerOpen=", drawerOpen);
 
-  const ranked = useMemo(() => {
-    const rawLog = JSON.parse(localStorage.getItem("margin_log") || "[]");
-    const affinityData = buildAffinity(rawLog);
-    const scored = CORPUS.map(a => {
-      const { score, reasons } = scoreArticle(a, { ...ctx, affinity: affinityData });
-      return { ...a, score, reasons };
-    });
-    scored.sort((a, b) => b.score - a.score);
-    return scored;
-  }, [ctx]);
+  useEffect(() => {
+    if (!onboarded) return;
+    let isMounted = true;
+    
+    async function loadFeed() {
+      setReranking(true);
+      try {
+        // 1. Start or update session
+        const sessRes = await startSession(userId, ctx.moodVector, ctx.region, ctx.profile);
+        setSessionId(sessRes.session_id);
+        localStorage.setItem("margin_sid", sessRes.session_id);
+        
+        // 2. Fetch recommendations
+        const recs = await fetchRecommendations(userId, sessRes.session_id, activeCat);
+        if (!isMounted) return;
+        
+        setRanked(recs.articles.map(mapBackendToFrontend));
+        setLatencySec(recs.latency_sec);
+      } catch (err) {
+        console.error("Failed to load feed:", err);
+      } finally {
+        if (isMounted) setReranking(false);
+      }
+    }
+    loadFeed();
+    return () => { isMounted = false; };
+  }, [ctx, onboarded, userId, activeCat]);
 
   const confidence = useMemo(() => {
-    if (ctx.profile === "newuser") return 0.35;
+    if (ctx.profile === "cold_start") return 0.50;
     const top = ranked.slice(0, 8);
-    return top.reduce((s, a) => s + a.score, 0) / top.length;
+    if (top.length === 0) return 0.5;
+    return top.reduce((s, a) => s + (a.score || 0.8), 0) / top.length;
   }, [ranked, ctx.profile]);
-
-  useEffect(() => {
-    setReranking(true);
-    const t = setTimeout(() => setReranking(false), 500);
-    return () => clearTimeout(t);
-  }, [ctx, ctx.heartRate]);
 
   useEffect(() => {
     if (!ctx.smartwatchConnected) return;
@@ -82,22 +108,14 @@ export default function NewsroomApp() {
     "--accent": "#C21E3B",
   };
 
-  const displayFeed = useMemo(() => {
-    if (activeCat === "Home") return ranked;
-    return ranked.filter(a => a.topic === activeCat);
-  }, [ranked, activeCat]);
-
-  // Ensure we safely pad the array with standard ranked items if a niche category has < 15 items
-  const safeFeed = displayFeed.length >= 15 ? displayFeed : [...displayFeed, ...ranked].slice(0, 15);
-
-  // Slice strictly the top 15 ranked articles
-  const hero = safeFeed[0];
-  const gridA_large = safeFeed[1];
-  const gridA_side = safeFeed.slice(2, 4); 
-  const gridB_compact = safeFeed.slice(4, 7); 
-  const gridC_main = safeFeed[7];
-  const gridC_side = safeFeed.slice(8, 11); 
-  const gridD_compact = safeFeed.slice(11, 15);
+  // The backend already correctly filters categories via the fast-loop API.
+  const hero = ranked[0];
+  const gridA_large = ranked[1];
+  const gridA_side = ranked.slice(2, 4); 
+  const gridB_compact = ranked.slice(4, 7); 
+  const gridC_main = ranked[7];
+  const gridC_side = ranked.slice(8, 11); 
+  const gridD_compact = ranked.slice(11, 15);
 
   if (!onboarded) {
     return (
@@ -163,7 +181,7 @@ export default function NewsroomApp() {
         ) : (
           <>
         <NewsNav active={activeCat} onChange={setActiveCat}
-          categories={["Home", "Geopolitics", "Finance", "Tech", "Health", "Culture", "Lifestyle"]} />
+          categories={["Home", ...TOPICS]} />
 
         {/* Re-rank status line */}
         <div style={{
@@ -180,7 +198,7 @@ export default function NewsroomApp() {
               animation: reranking ? "blink 0.6s ease-in-out infinite alternate" : "none",
             }} />
             <span style={{ fontWeight: 600 }}>
-              {reranking ? "Re-ranking feed…" : `Feed tuned for ${PROFILES[ctx.profile].name}`}
+              {reranking ? "Re-ranking feed…" : `Feed tuned for ${BACKEND_ARCHETYPES[ctx.profile]?.name || "You"}`}
             </span>
             <span style={{ opacity: 0.45 }}>·</span>
             <span style={{ opacity: 0.7 }}>{Math.round(confidence * 100)}% match</span>
@@ -285,7 +303,7 @@ export default function NewsroomApp() {
         context={ctx}
         onSave={handleUpdateFeed}
         confidence={confidence}
-        latency="0.4"
+        latency={latencySec}
       />
       <AnalyticsDrawer 
         open={analyticsOpen} 

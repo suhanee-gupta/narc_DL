@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Menu, Play, Headphones, Bookmark, ThumbsUp, ThumbsDown, Watch } from 'lucide-react';
 import { logInteraction, isBookmarked, saveBookmark, removeBookmark } from './engine.jsx';
 import { playVoice, stopVoice } from './newsroom-voice.jsx';
+import { recordInteraction } from './api.js';
 
 function ActionRow({ a, size = 14, hideListen = false }) {
   const [act, setAct] = useState(() => ({
@@ -9,15 +10,28 @@ function ActionRow({ a, size = 14, hideListen = false }) {
     save: a ? isBookmarked(a.id) : false,
   }));
   
-  const handleAct = (e, type) => {
+  const handleAct = async (e, type) => {
     e.preventDefault();
     e.stopPropagation();
     const wasActive = act[type];
     setAct(p => ({ ...p, [type]: !p[type] }));
+    
+    const uid = localStorage.getItem("margin_uid");
+    const sid = localStorage.getItem("margin_sid");
+
     if (!wasActive) {
       logInteraction(type, a);
       if (type === "save") saveBookmark(a);
       if (type === "listen") playVoice(a?.headline, a?.author, a?.topic);
+      if (uid && sid && a?.id) {
+        // rank position is not known here, defaulting to 1 for now
+        let actionStr = type;
+        if (type === "like") actionStr = "dwell_long";
+        if (type === "dislike") actionStr = "skip";
+        if (type === "save") actionStr = "share";
+        if (type === "listen") actionStr = "dwell_long";
+        recordInteraction(uid, sid, a.id, actionStr, 1).catch(e => console.error(e));
+      }
     } else {
       if (type === "save") removeBookmark(a?.id);
       if (type === "listen") stopVoice();
@@ -58,40 +72,55 @@ function ActionRow({ a, size = 14, hideListen = false }) {
 }
 
 // ── Image placeholder ─────────────────────────────────────────
-export function NewsImg({ a, ratio = "16 / 10", isHero = false }) {
-  const t = (a?.topic || "Tech").toLowerCase();
-  const validTopics = ["tech", "finance", "geopolitics", "health", "lifestyle", "culture"];
-  const topicMatch = validTopics.includes(t) ? t : "tech";
-  
-  // Deterministic random choice for variants based on story ID
-  const idStr = String(a?.id || "0");
-  let numId = 0;
-  for (let i = 0; i < idStr.length; i++) {
-    numId += idStr.charCodeAt(i);
-  }
+const CATEGORY_GRADIENTS = {
+  AI:            { from: "#4F46E5", to: "#7C3AED" },
+  Bitcoin:       { from: "#F59E0B", to: "#D97706" },
+  Business:      { from: "#1E40AF", to: "#3B82F6" },
+  Cricket:       { from: "#15803D", to: "#22C55E" },
+  Crypto:        { from: "#7C3AED", to: "#A855F7" },
+  Education:     { from: "#0E7490", to: "#06B6D4" },
+  Elections:     { from: "#B91C1C", to: "#EF4444" },
+  Entertainment: { from: "#BE185D", to: "#EC4899" },
+  Environment:   { from: "#047857", to: "#10B981" },
+  Finance:       { from: "#0369A1", to: "#0EA5E9" },
+  Health:        { from: "#0F766E", to: "#14B8A6" },
+  IPL:           { from: "#4D7C0F", to: "#84CC16" },
+  Inflation:     { from: "#C2410C", to: "#F97316" },
+  Markets:       { from: "#4338CA", to: "#6366F1" },
+  Movies:        { from: "#7E22CE", to: "#A855F7" },
+  OpenAI:        { from: "#18181B", to: "#3F3F46" },
+  Politics:      { from: "#991B1B", to: "#DC2626" },
+  Science:       { from: "#155E75", to: "#0891B2" },
+  Sports:        { from: "#166534", to: "#16A34A" },
+  Startups:      { from: "#5B21B6", to: "#7C3AED" },
+  Technology:    { from: "#1E3A8A", to: "#2563EB" },
+  Tesla:         { from: "#9F1239", to: "#E11D48" },
+  War:           { from: "#450A0A", to: "#991B1B" },
+  World:         { from: "#312E81", to: "#4F46E5" },
+};
 
-  // Resolve Extension & Variant mapping
-  let variant = isHero ? 0 : (numId % 3) + 1; // 0 for hero, 1-3 for normal cards
-  
-  const extMap = {
-    culture: [".jpg", ".webp", ".jpg", ".jpg"],
-    finance: [".jpg", ".jpg", ".jpg", ".jpg"],
-    geopolitics: [".png", ".png", ".png", ".png"],
-    health: [".jpg", ".jpg", ".jpg", ".jpg"],
-    lifestyle: [".jpg", ".jpg", ".jpg", ".jpg"],
-    tech: [".webp", ".jpg", ".webp", ".webp"],
-  };
-  
-  const ext = (extMap[topicMatch] && extMap[topicMatch][variant]) || ".jpg";
-  const imgSrc = `/images/${topicMatch}_${variant}${ext}`;
+export function NewsImg({ a, ratio = "16 / 10", isHero = false }) {
+  const category = a?.topic || "World";
+  const grad = CATEGORY_GRADIENTS[category] || { from: "#374151", to: "#6B7280" };
 
   return (
-    <div className="relative w-full overflow-hidden bg-neutral-900" style={{ aspectRatio: ratio }}>
-      <img src={imgSrc} alt={a?.headline || "News"} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none" />
-      
+    <div className="relative w-full overflow-hidden" style={{
+      aspectRatio: ratio,
+      background: `linear-gradient(135deg, ${grad.from} 0%, ${grad.to} 100%)`,
+    }}>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span style={{
+          fontFamily: "'Inter', sans-serif",
+          fontSize: isHero ? 16 : 12,
+          fontWeight: 700,
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          color: "rgba(255,255,255,0.2)",
+        }}>{category}</span>
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
       <div className="absolute bottom-0 left-0 right-0 p-[12px] flex items-center justify-center font-mono text-[10px] tracking-[0.25em] uppercase text-center text-white/90 pointer-events-none z-10 drop-shadow-md">
-        [ {a?.topic || "News"} · #{String(a?.id || "0").slice(0, 5).padStart(3, "0")} ]
+        [ {category} · #{String(a?.id || "0").slice(0, 5).padStart(3, "0")} ]
       </div>
     </div>
   );
@@ -182,12 +211,12 @@ export function NewsTopBar({ onOpenFilter, onOpenSearch, onToggleMenu, region, o
 // ── Nav ──────────────────────────────────────────────────────
 export function NewsNav({ active, onChange, categories = [] }) {
   return (
-    <nav className="flex justify-center py-3 border-y border-neutral-900 mb-10">
+    <nav className="flex py-3 border-y border-neutral-900 mb-10 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
       {categories.map((c, i) => (
         <button
           key={c}
           onClick={() => onChange && onChange(c)}
-          className={`relative bg-transparent border-none cursor-pointer px-[22px] py-1 font-sans text-xs font-semibold text-neutral-900 ${c === active ? 'opacity-100' : 'opacity-70 hover:opacity-100'
+          className={`relative bg-transparent border-none cursor-pointer px-[14px] py-1 font-sans text-xs font-semibold text-neutral-900 whitespace-nowrap flex-shrink-0 ${c === active ? 'opacity-100' : 'opacity-70 hover:opacity-100'
             } ${i < categories.length - 1 ? 'border-r border-neutral-900/10' : ''}`}
         >
           {c}
@@ -204,8 +233,15 @@ export function NewsNav({ active, onChange, categories = [] }) {
 export function NewsHero({ a, match }) {
   const [hov, setHov] = useState(false);
   if (!a) return null;
+
+  const handleArticleClick = () => {
+    logInteraction("read", a);
+    const url = a.canonical_url || a.url || a.link;
+    if (url) window.open(url, '_blank');
+  };
+
   return (
-    <article onClick={() => logInteraction("read", a)} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+    <article onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ margin: "28px 0 18px", cursor: "pointer" }}>
       <div style={{ position: "relative", overflow: "hidden" }}>
         <div style={{
@@ -306,9 +342,15 @@ export function NewsCard({ a, variant = "compact", match }) {
   if (!a) return null;
   const pct = match ?? Math.round((a?.score || 0) * 100);
 
+  const handleArticleClick = () => {
+    logInteraction("read", a);
+    const url = a.canonical_url || a.url || a.link;
+    if (url) window.open(url, '_blank');
+  };
+
   if (variant === "row") {
     return (
-      <article onClick={() => logInteraction("read", a)} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      <article onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
         style={{
           display: "grid", gridTemplateColumns: "1fr 140px", gap: 16,
           padding: "14px 0", borderBottom: "1px solid rgba(0,0,0,0.1)",
@@ -338,7 +380,7 @@ export function NewsCard({ a, variant = "compact", match }) {
 
   if (variant === "large") {
     return (
-      <article onClick={() => logInteraction("read", a)} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      <article onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
         style={{ cursor: "pointer" }}>
         <div style={{ overflow: "hidden", position: "relative" }}>
           <div style={{
@@ -380,7 +422,7 @@ export function NewsCard({ a, variant = "compact", match }) {
 
   // compact
   return (
-    <article onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+    <article onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ cursor: "pointer" }}>
       <div style={{ overflow: "hidden", position: "relative" }}>
         <div style={{

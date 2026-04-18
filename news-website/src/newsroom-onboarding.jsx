@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { PROFILES } from './engine.jsx';
-
+export const BACKEND_ARCHETYPES = {
+  cold_start: { name: "The New User", bio: "Start fresh and let the engine learn your preferences." },
+  sports_fan: { name: "The Sports Fan", bio: "Prioritizes match updates, IPL, and athlete news." },
+  sci_tech: { name: "The Technologist", bio: "Follows AI, startups, tech, and scientific breakthroughs." },
+  finance_biz: { name: "The Market Watcher", bio: "Focuses on stocks, crypto, inflation, and business." },
+  wellness: { name: "The Wellness Seeker", bio: "Interested in health, environment, and education." },
+  world_watcher: { name: "The Global Citizen", bio: "Deep dives into geopolitics, world news, and elections." },
+  foodie_lifestyle: { name: "The Culturist", bio: "Follows entertainment, movies, and lifestyle." }
+};
 export const MOOD_KEYS = ["happy", "sad", "angry", "anxious", "calm", "curious"];
 
 export const META = {
@@ -71,7 +78,7 @@ export function MoodSliders({ value, onChange, compact = false }) {
 export function NewsOnboarding({ onComplete }) {
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState({
-    profile: "casual",
+    profile: "cold_start",
     timeContext: "morning",
     env: "",
     region: "Global",
@@ -142,7 +149,7 @@ export function NewsOnboarding({ onComplete }) {
               fontFamily: "'Playfair Display', serif", fontSize: 32, fontWeight: 500, margin: "0 0 24px"
             }}>Identity & Interests</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
-              {Object.entries(PROFILES).map(([id, p]) => (
+              {Object.entries(BACKEND_ARCHETYPES).map(([id, p]) => (
                 <button key={id} onClick={() => setDraft({ ...draft, profile: id })}
                   style={{
                     textAlign: "left", padding: "18px 24px",

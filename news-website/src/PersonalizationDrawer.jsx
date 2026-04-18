@@ -1,6 +1,5 @@
 import React from 'react';
-import { PROFILES } from './engine.jsx';
-import { MoodSliders, defaultMoodVector } from './newsroom-onboarding.jsx';
+import { BACKEND_ARCHETYPES, MoodSliders, defaultMoodVector } from './newsroom-onboarding.jsx';
 
 // Off-canvas personalization drawer
 const { useState: dUS } = React;
@@ -60,7 +59,7 @@ export default function PersonalizationDrawer({ open, onClose, context, onSave, 
 
           <DrawerField label="User Profile" note="Switch simulated reader. New User triggers cold-start.">
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {Object.entries(PROFILES).map(([id, p]) => (
+              {Object.entries(BACKEND_ARCHETYPES).map(([id, p]) => (
                 <button key={id} onClick={() => setDraft({ ...draft, profile: id })}
                   style={{
                     textAlign: "left", padding: "12px 14px",
