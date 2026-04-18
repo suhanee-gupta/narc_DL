@@ -1,0 +1,17 @@
+PAGE LOG: [vite] connecting...
+PAGE LOG: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+PAGE LOG: NewsroomApp rendering. drawerOpen= false
+PAGE LOG: NewsroomApp rendering. drawerOpen= false
+PAGE LOG: Drawer useEffect triggered. open= false
+PAGE LOG: Drawer useEffect triggered. open= false
+PAGE LOG: [vite] connected.
+PAGE LOG: NewsroomApp rendering. drawerOpen= false
+PAGE LOG: NewsroomApp rendering. drawerOpen= false
+PAGE LOG: NewsroomApp rendering. drawerOpen= false
+PAGE LOG: NewsroomApp rendering. drawerOpen= false
+PAGE LOG: NewsroomApp rendering. drawerOpen= true
+PAGE LOG: NewsroomApp rendering. drawerOpen= true
+PAGE LOG: Drawer useEffect triggered. open= true
+PAGE LOG: NewsroomApp rendering. drawerOpen= false
+PAGE LOG: NewsroomApp rendering. drawerOpen= false
+PAGE LOG: Drawer useEffect triggered. open= false
