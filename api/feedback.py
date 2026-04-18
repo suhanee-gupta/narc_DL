@@ -30,6 +30,7 @@ class ClickEvent(BaseModel):
     article_id: str
     mood: str = "neutral"
     time_of_day: str = "morning"
+    location: str = "IN"
 
 
 class DwellEvent(BaseModel):
@@ -38,14 +39,16 @@ class DwellEvent(BaseModel):
     seconds: float = Field(..., gt=0)
     mood: str = "neutral"
     time_of_day: str = "morning"
+    location: str = "IN"
 
 
-class RatingEvent(BaseModel):
+class LikeDislikeEvent(BaseModel):
     user_id: str
     article_id: str
-    rating: int = Field(..., ge=1, le=5, description="1–5 star rating")
+    rating: str | None = Field(None, description="like | dislike | neutral")
     mood: str = "neutral"
     time_of_day: str = "morning"
+    location: str = "IN"
 
 
 # ── Background tasks ──────────────────────────────────────────────────────────
@@ -56,6 +59,7 @@ async def _process_feedback(
     reward: float,
     mood: str,
     time_of_day: str,
+    location: str,
 ):
     """
     Asynchronous Feedback Loop (Step described in the pipeline):
@@ -74,6 +78,7 @@ async def _process_feedback(
         user_id=user_id,
         mood=mood,
         time_of_day=time_of_day,
+        location=location,
         history=history,
     ) 
 
@@ -98,7 +103,7 @@ async def log_click(event: ClickEvent, background_tasks: BackgroundTasks):
     """
     background_tasks.add_task(
         _process_feedback,
-        event.user_id, event.article_id, 1.0, event.mood, event.time_of_day,
+        event.user_id, str(event.article_id), 1.0, event.mood, event.time_of_day, event.location,
     )
     return {"status": "accepted", "reward": 1.0}
 
@@ -108,7 +113,7 @@ async def log_ignore(event: ClickEvent, background_tasks: BackgroundTasks):
     """User scrolled past an article → negative signal."""
     background_tasks.add_task(
         _process_feedback,
-        event.user_id, event.article_id, 0.0, event.mood, event.time_of_day,
+        event.user_id, str(event.article_id), 0.0, event.mood, event.time_of_day, event.location,
     )
     return {"status": "accepted", "reward": 0.0}
 
@@ -127,17 +132,24 @@ async def log_dwell(event: DwellEvent, background_tasks: BackgroundTasks):
 
     background_tasks.add_task(
         _process_feedback,
-        event.user_id, event.article_id, reward, event.mood, event.time_of_day,
+        event.user_id, str(event.article_id), reward, event.mood, event.time_of_day, event.location,
     )
     return {"status": "accepted", "reward": round(reward, 3)}
 
 
-@router.post("/rating", summary="Log explicit 1-5 star rating")
-async def log_rating(event: RatingEvent, background_tasks: BackgroundTasks):
-    """Normalize 1-5 rating to [0, 1] reward."""
-    reward = (event.rating - 1) / 4.0
+@router.post("/rating", summary="Log like, dislike, or neutral rating")
+async def log_rating(event: LikeDislikeEvent, background_tasks: BackgroundTasks):
+    """Normalize rating to [-1, 1] reward."""
+    REWARD_MAP = {
+        "like": 1.0,
+        "neutral": 0.0,
+        "dislike": -1.0
+    }
+
+    reward = REWARD_MAP.get(event.rating, 0.0)
+
     background_tasks.add_task(
         _process_feedback,
-        event.user_id, event.article_id, reward, event.mood, event.time_of_day,
+        event.user_id, str(event.article_id), reward, event.mood, event.time_of_day, event.location
     )
     return {"status": "accepted", "reward": round(reward, 3)}

@@ -27,7 +27,7 @@ class Config:
 
     # ── History window ──────────────────────────────────────────────────────
     # How many recently clicked article IDs are included in the context.
-    HISTORY_WINDOW: int = int(os.getenv("HISTORY_WINDOW", "20"))
+    HISTORY_WINDOW: int = int(os.getenv("HISTORY_WINDOW", "30"))
 
     # ── Artifacts paths ─────────────────────────────────────────────────────
     ARTIFACTS_DIR: str = os.getenv("ARTIFACTS_DIR", "artifacts")
