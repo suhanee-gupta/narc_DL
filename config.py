@@ -9,8 +9,8 @@ RERANK_REFRESH_EVERY = 1     # Refresh more often in simulation to see the loop 
 BANDIT_ALPHA = 0.2           # TRICK: Lower alpha = faster exploitation (quicker convergence)
 
 SLOW_LOOP_INTERVAL_SEC = 3600
-SLOW_LOOP_LR = 0.1
-FAST_LOOP_USER_VEC_LR = 0.6      # TRICK: Higher LR = user vector adapts to clicks instantly
+SLOW_LOOP_LR = 0.4               # aggressive slow loop update for demo
+FAST_LOOP_USER_VEC_LR = 0.7      # user_vec shifts strongly after 2-3 interactions
 
 FRESHNESS_HALF_LIFE_HOURS = 24.0
 

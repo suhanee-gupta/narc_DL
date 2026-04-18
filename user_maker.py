@@ -310,7 +310,7 @@ def compute_reward(interactions: List[Dict]) -> float:
     reward = action_reward + diversity_bonus + mood_bonus
     
     # Debug line to see component contribution
-    # print(f" [Act:{action_reward:+.2f} Div:{diversity_bonus:+.2f} Mood:{mood_bonus:+.2f}]", end="")
+    print(f" [Act:{action_reward:+.2f} Div:{diversity_bonus:+.2f} Mood:{mood_bonus:+.2f}]", end="")
 
     return float(reward)
 

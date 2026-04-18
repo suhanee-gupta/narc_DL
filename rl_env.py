@@ -214,7 +214,7 @@ class RLEnvironment:
         if embedding is not None:
             self.ctx.fast_update_user_vec(user_id, embedding, action)
 
-        # buffer for slow loop
+        # buffer + immediate flush so click_history updates before next recommendation
         self.ctx.buffer_interaction({
             "user_id":           user_id,
             "story_id":          story_id,
@@ -225,6 +225,7 @@ class RLEnvironment:
             "article_embedding": embedding if embedding is not None
                                   else np.zeros(EMBED_DIM, dtype=np.float32),
         })
+        self.ctx.flush_updates()   # write click_history to disk immediately
 
     # ── simulation ────────────────────────────────────────────────────────────
 
@@ -272,6 +273,7 @@ class RLEnvironment:
 
         engine = UserEngine(policy)
         result = SessionResult(user_id=user_id)
+        seen_ids = set()
 
         print(f"    Learning Trajectory (User {user_id[:8]}...): ", end="", flush=True)
         for round_idx in range(FAST_LOOP_ROUNDS):
@@ -286,7 +288,14 @@ class RLEnvironment:
                 ctx_vecs, candidates = _build_candidates(result.interactions)
 
             top_k    = self.bandit.select_topk(ctx_vecs, candidates, TOP_K_RECS)
+            # FILTER: Remove articles already seen in this session to prevent 'repeaking'
+            fresh_indices = [i for i, a in enumerate(candidates) if a.id not in seen_ids]
+            f_ctx = [ctx_vecs[i] for i in fresh_indices]
+            f_cand = [candidates[i] for i in fresh_indices]
+
+            top_k    = self.bandit.select_topk(f_ctx, f_cand, TOP_K_RECS)
             top_ctxs = [ctx_vecs[candidates.index(a)] for a in top_k]
+            for a in top_k: seen_ids.add(a.id)
 
             # fresh state each round — session_length applies per round, not total
             state = engine.start_session()
@@ -296,12 +305,14 @@ class RLEnvironment:
                 break
 
             # Detailed reward breakdown and 'repeaking' check
+            # Detailed reward breakdown: c=click, s=skip, h=high-engagement, d=dwell_short
             r_reward = compute_reward(interactions)
-            acts = {"c": 0, "s": 0, "h": 0} # clicks, skips, shares/dwell_long
+            acts = {"c": 0, "s": 0, "h": 0, "d": 0}
             for ix in interactions:
                 if ix["action"] == "skip": acts["s"] += 1
                 elif ix["action"] in ["share", "dwell_long"]: acts["h"] += 1
-                else: acts["c"] += 1
+                elif ix["action"] == "click": acts["c"] += 1
+                elif ix["action"] == "dwell_short": acts["d"] += 1
             
             # ID Fingerprint: Last 4 chars of top 2 recs
             fingerprint = [str(a.id)[-4:] for a in top_k[:2]]
