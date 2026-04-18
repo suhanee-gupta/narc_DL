@@ -1,0 +1,12 @@
+mood toggle
+location onboarding
+time of the day
+start personalization / interest (cold start as option)
+cold start, 
+sees feed accordingly (<2secs)
+
+user interacts with feed -> show interactions on behavior log / analysics page
+
+refresh feed
+(fast loop runs)
+gets new improved feed
