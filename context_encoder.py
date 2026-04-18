@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from config import CATEGORIES, ARCHETYPES, LOCATIONS, TIME_BUCKETS
 
 
-def _time_bucket(timestamp: str) -> str:
+def time_bucket(timestamp: str) -> str:
     for fmt in ("%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S%z",
                 "%a, %d %b %Y %H:%M:%S %Z", "%a, %d %b %Y %H:%M:%S %z"):
         try:
@@ -15,10 +15,10 @@ def _time_bucket(timestamp: str) -> str:
     else:
         return "evening"
     hour = dt.hour
-    if hour < 6:   return "morning"
-    if hour < 12:  return "afternoon"
-    if hour < 18:  return "evening"
-    return "night"
+    if hour < 6:   return "night"
+    if hour < 12:  return "morning"
+    if hour < 18:  return "afternoon"
+    return "evening"
 
 
 def _onehot(value, vocab: list) -> np.ndarray:
@@ -42,7 +42,7 @@ def build(
                               dtype=np.float32)
     archetype_vec = _onehot(archetype, ARCHETYPES)
     location_vec  = _onehot(location, LOCATIONS)
-    time_vec      = _onehot(_time_bucket(timestamp), TIME_BUCKETS)
+    time_vec      = _onehot(time_bucket(timestamp), TIME_BUCKETS)
     category_vec  = _onehot(category, CATEGORIES)
     freshness_vec = np.array([float(freshness)], dtype=np.float32)
     score_vec     = np.array([float(1.0 / (1.0 + math.exp(-reranker_score)))],

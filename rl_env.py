@@ -273,10 +273,11 @@ class RLEnvironment:
                 if emb is not None:
                     self.ctx.fast_update_user_vec(user_id, emb, ix["action"])
 
+                _art = self.pipeline.get_article(ix["article_id"])
                 self.ctx.buffer_interaction({
                     "user_id":           user_id,
                     "story_id":          ix["article_id"],
-                    "title":             "",
+                    "title":             _art.title if _art else "",
                     "category":          ix["category"],
                     "action":            ix["action"],
                     "timestamp":         timestamp,
@@ -294,12 +295,17 @@ class RLEnvironment:
 def _policy_archetype(policy: UserPolicy) -> str:
     top_cat = max(policy.category_weights, key=policy.category_weights.get)
     mapping = {
-        "sports": "sports_fan", "health": "wellness",
-        "finance": "finance_biz", "tech": "sci_tech",
-        "world": "world_watcher", "politics": "world_watcher",
-        "science": "sci_tech", "entertainment": "foodie_lifestyle",
+        "Sports": "sports_fan", "Cricket": "sports_fan", "IPL": "sports_fan",
+        "Health": "wellness", "Education": "wellness", "Environment": "wellness",
+        "Finance": "finance_biz", "Business": "finance_biz", "Markets": "finance_biz",
+        "Bitcoin": "finance_biz", "Crypto": "finance_biz", "Inflation": "finance_biz",
+        "Technology": "sci_tech", "AI": "sci_tech", "Science": "sci_tech",
+        "OpenAI": "sci_tech", "Startups": "sci_tech", "Tesla": "sci_tech",
+        "World": "world_watcher", "Politics": "world_watcher",
+        "Elections": "world_watcher", "War": "world_watcher",
+        "Entertainment": "foodie_lifestyle", "Movies": "foodie_lifestyle",
     }
-    return mapping.get(top_cat.lower(), "cold_start")
+    return mapping.get(top_cat, "cold_start")
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
