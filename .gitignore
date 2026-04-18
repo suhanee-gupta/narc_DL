@@ -2,3 +2,4 @@
 *.vec
 MINDsmall_train/
 .vscode
+*.pkl
