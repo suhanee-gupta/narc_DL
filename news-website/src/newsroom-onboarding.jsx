@@ -149,9 +149,9 @@ export function NewsOnboarding({ onComplete }) {
         {current === "profile" && (
           <div style={{ animation: "slideUp 500ms ease" }}>
             <h2 style={{
-              fontFamily: "'Playfair Display', serif", fontSize: 32, fontWeight: 500, margin: "0 0 24px"
+              fontFamily: "'Playfair Display', serif", fontSize: 40, fontWeight: 500, margin: "0 0 24px"
             }}>Identity & Interests</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 5 }}>
               {Object.entries(BACKEND_ARCHETYPES).map(([id, p]) => (
                 <button key={id} onClick={() => setDraft({ ...draft, profile: id })}
                   style={{
