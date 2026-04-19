@@ -28,6 +28,7 @@ export default function NewsroomApp() {
   const [ranked, setRanked] = useState([]);
   const [latencySec, setLatencySec] = useState(0);
   const [sessionId, setSessionId] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const userId = useMemo(() => {
     let id = localStorage.getItem("margin_uid");
@@ -84,7 +85,7 @@ export default function NewsroomApp() {
     }
     loadFeed();
     return () => { isMounted = false; };
-  }, [ctx, onboarded, userId, activeCat]);
+  }, [ctx, onboarded, userId, activeCat, refreshKey]);
 
   const confidence = useMemo(() => {
     if (ctx.profile === "cold_start") return 0.50;
@@ -208,6 +209,32 @@ export default function NewsroomApp() {
                 ctx.timeContext === "deepwork" ? "Deep work" : "Wind-down"}
             </span>
           </div>
+          <button
+            onClick={() => !reranking && setRefreshKey(k => k + 1)}
+            disabled={reranking}
+            style={{
+              background: "none",
+              border: "1px solid rgba(0,0,0,0.25)",
+              cursor: reranking ? "not-allowed" : "pointer",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 10, fontWeight: 600,
+              letterSpacing: "0.18em", textTransform: "uppercase",
+              color: "var(--ink)", padding: "5px 13px",
+              display: "flex", alignItems: "center", gap: 7,
+              opacity: reranking ? 0.35 : 1,
+              transition: "opacity 0.2s ease, background 0.15s ease",
+              flexShrink: 0,
+            }}
+            onMouseEnter={e => { if (!reranking) e.currentTarget.style.background = "var(--ink)", e.currentTarget.style.color = "var(--bone)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--ink)"; }}
+          >
+            <span style={{
+              display: "inline-block",
+              animation: reranking ? "spin 1s linear infinite" : "none",
+              fontSize: 12, lineHeight: 1,
+            }}>↺</span>
+            Refresh Feed
+          </button>
         </div>
 
         {reranking && ranked.length === 0 ? (

@@ -1,7 +1,7 @@
 EMBED_DIM = 768
 CONTEXT_DIM = 46
 
-TOP_N_CANDIDATES = 200
+TOP_N_CANDIDATES = 50
 TOP_K_RECS = 10
 FAST_LOOP_ROUNDS = 50        # As requested: 50 fast loops per session
 SLOW_LOOP_FLUSH_EVERY = 2    # As requested: 50 rounds / 2 = 25 flushes (approx 20)
