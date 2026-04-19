@@ -85,6 +85,11 @@ export default function PersonalizationDrawer({ open, onClose, context, onSave, 
             <MoodSliders 
               value={draft.moodVector || defaultMoodVector()} 
               onChange={v => setDraft({ ...draft, moodVector: v })} 
+              onCommit={v => {
+                const updatedDraft = { ...draft, moodVector: v };
+                setDraft(updatedDraft);
+                onSave(updatedDraft);
+              }}
               compact 
             />
           </DrawerField>

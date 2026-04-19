@@ -23,8 +23,9 @@ export function defaultMoodVector() {
   return { happy: 0.5, sad: 0, angry: 0, anxious: 0, calm: 0.5, curious: 0.5 };
 }
 
-export function MoodSliders({ value, onChange, compact = false }) {
+export function MoodSliders({ value, onChange, onCommit, compact = false }) {
   const set = (k, v) => onChange({ ...value, [k]: v });
+  const commit = (k, v) => onCommit && onCommit({ ...value, [k]: v });
 
   return (
     <div style={{
@@ -56,6 +57,8 @@ export function MoodSliders({ value, onChange, compact = false }) {
               type="range" min="0" max="100" 
               value={pct} 
               onChange={e => set(k, e.target.value / 100)} 
+              onMouseUp={e => commit(k, e.target.value / 100)}
+              onTouchEnd={e => commit(k, e.target.value / 100)}
               className="drawer-range"
               style={{ width: "100%", cursor: "ew-resize" }}
             />

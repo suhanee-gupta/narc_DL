@@ -230,10 +230,6 @@ export function NewsTopBar({ onOpenFilter, onOpenSearch, onToggleMenu, region, o
           <Watch size={14} className="stroke-[2]" />
           {ctx?.smartwatchConnected && <span className="font-sans text-[10px] font-bold tracking-[0.1em] uppercase pr-1">{ctx.heartRate || "--"} BPM</span>}
         </button>
-        <button onClick={onOpenAnalytics} title="Behaviour Analytics" className="bg-transparent border border-neutral-900 p-1.5 cursor-pointer text-neutral-900 inline-flex items-center gap-1.5 justify-center hover:bg-neutral-900 hover:text-white transition-colors">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-          <span className="font-sans text-[10px] font-bold tracking-[0.2em] uppercase pr-1">Behaviour</span>
-        </button>
         <button onClick={onOpenBookmarks} title="Saved Articles" className="bg-transparent border border-[#B8860B] p-1.5 cursor-pointer text-[#B8860B] inline-flex items-center gap-1.5 justify-center hover:bg-[#B8860B] hover:text-white transition-colors">
           <Bookmark size={14} className="stroke-[2]" />
           <span className="font-sans text-[10px] font-bold tracking-[0.2em] uppercase pr-1">Saved</span>

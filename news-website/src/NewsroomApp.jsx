@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 
 import PersonalizationDrawer from "./PersonalizationDrawer.jsx";
-import AnalyticsDrawer from "./AnalyticsDrawer.jsx";
 import BookmarksDrawer from "./BookmarksDrawer.jsx";
 import SearchOverlay from "./SearchOverlay.jsx";
 import { BACKEND_ARCHETYPES, NewsOnboarding, defaultMoodVector } from "./newsroom-onboarding.jsx";
@@ -20,7 +19,6 @@ export default function NewsroomApp() {
   const [onboarded, setOnboarded] = useState(false);
   const [activeCat, setActiveCat] = useState("Home");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
@@ -142,7 +140,6 @@ export default function NewsroomApp() {
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 48px" }}>
         <NewsTopBar
           onOpenFilter={() => setDrawerOpen(true)}
-          onOpenAnalytics={() => setAnalyticsOpen(true)}
           onOpenBookmarks={() => setBookmarksOpen(true)}
           onToggleWatch={() => {
             const next = !ctx.smartwatchConnected;
@@ -347,10 +344,6 @@ export default function NewsroomApp() {
         onSave={handleUpdateFeed}
         confidence={confidence}
         latency={latencySec}
-      />
-      <AnalyticsDrawer 
-        open={analyticsOpen} 
-        onClose={() => setAnalyticsOpen(false)} 
       />
       <BookmarksDrawer
         open={bookmarksOpen}

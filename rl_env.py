@@ -90,16 +90,16 @@ def _now_iso() -> str:
 
 
 def _mood_multipliers(articles: list, mood: dict) -> np.ndarray:
-    """Per-article scalar: 0.2 = deprioritize, 1.5 = boost, 1.0 = neutral."""
+    """Per-article scalar: 0.05 = deprioritize, 10.0 = boost, 1.0 = neutral."""
     muls = np.ones(len(articles), dtype=np.float32)
     for mood_key, val in mood.items():
         if val > 0.6 and mood_key in MOOD_MODIFIERS:
             mod = MOOD_MODIFIERS[mood_key]
             for i, a in enumerate(articles):
                 if a.category in mod["deprioritize"]:
-                    muls[i] *= 0.2
+                    muls[i] *= 0.05
                 if a.category in mod["boost"]:
-                    muls[i] *= 1.5
+                    muls[i] *= 10.0
     return muls
 
 
@@ -130,9 +130,9 @@ def _candidate_pool(articles: list[Article], user_vec: np.ndarray,
             if val > 0.6 and mood_key in MOOD_MODIFIERS:
                 mod = MOOD_MODIFIERS[mood_key]
                 for c in mod["deprioritize"]:
-                    adjusted[c] = adjusted.get(c, 0.01) * 0.2
+                    adjusted[c] = adjusted.get(c, 0.01) * 0.05
                 for c in mod["boost"]:
-                    adjusted[c] = adjusted.get(c, 0.01) * 1.5
+                    adjusted[c] = adjusted.get(c, 0.01) * 10.0
         total = sum(adjusted.values()) or 1.0
         adjusted = {k: v / total for k, v in adjusted.items()}
 
@@ -229,6 +229,15 @@ class RLEnvironment:
                 text = f" {a.title} {a.summary} {a.category} ".lower()
                 if any(k in text for k in loc_keys):
                     scores[i] += 5.0  # boost so they survive the top-60 cut
+
+        # Also apply strong semantic boost for explicit moods matching category
+        if mood:
+            for mood_key, val in mood.items():
+                if val > 0.6 and mood_key in MOOD_MODIFIERS:
+                    boost_cats = MOOD_MODIFIERS[mood_key]["boost"]
+                    for i, (a, _) in enumerate(pairs):
+                        if a.category in boost_cats:
+                            scores[i] += 3.0  # Huge reranker boost for mood matches
 
         ranked = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:60]
 
