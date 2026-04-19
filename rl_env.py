@@ -192,11 +192,44 @@ class RLEnvironment:
                         pairs.append((a, i))
                         seen.add(i)
 
+        # Inject region-specific candidates into pool
+        loc_str = str(location).lower()
+        loc_keys = []
+        if "global" not in loc_str:
+            if "america" in loc_str or "us" in loc_str:
+                loc_keys = [" us ", " usa ", "america", "biden", "trump", "california", "new york", "texas"]
+            elif "europe" in loc_str or "uk" in loc_str:
+                loc_keys = ["europe", " uk ", "london", "britain", "germany", "france", " eu ", "russia", "ukraine"]
+            elif "asia" in loc_str or "india" in loc_str:
+                loc_keys = ["asia", "china", "india", "japan", "delhi", "modi", "beijing", "tokyo", "mumbai"]
+            elif "local" in loc_str:
+                loc_keys = ["local", "city", "mayor", "town", "county", "council", "police", "community", "delhi"]
+
+            if loc_keys:
+                loc_cands = []
+                for i, a in enumerate(articles):
+                    text = f" {a.title} {a.summary} {a.category} ".lower()
+                    if any(k in text for k in loc_keys):
+                        loc_cands.append((a, i))
+                loc_cands.sort(key=lambda x: x[0].freshness, reverse=True)
+                seen = {idx for _, idx in pairs}
+                for a, i in loc_cands[:30]:
+                    if i not in seen:
+                        pairs.append((a, i))
+                        seen.add(i)
+
         # cross-encoder rerank
         docs   = [f"{a.title}. {a.summary}" for a, _ in pairs]
         query  = query_builder.build(archetype, mood, location, timestamp,
                                      profile.get("click_history", []))
         scores = score_pairs(query, docs)
+
+        if loc_keys:
+            for i, (a, _) in enumerate(pairs):
+                text = f" {a.title} {a.summary} {a.category} ".lower()
+                if any(k in text for k in loc_keys):
+                    scores[i] += 5.0  # boost so they survive the top-60 cut
+
         ranked = sorted(zip(pairs, scores), key=lambda x: x[1], reverse=True)[:60]
 
         # LinUCB select top-k
@@ -207,6 +240,18 @@ class RLEnvironment:
         
         # Increase backend return count to 30 so frontend grid (15 slots) never runs sparse
         top_k      = self.bandit.select_topk(ctx_vecs, candidates, 30)
+
+        # Force location matches to the top
+        if loc_keys:
+            loc_matches = []
+            others = []
+            for a in top_k:
+                text = f" {a.title} {a.summary} {a.category} ".lower()
+                if any(k in text for k in loc_keys):
+                    loc_matches.append(a)
+                else:
+                    others.append(a)
+            top_k = loc_matches + others
 
         return [
             {
