@@ -21,7 +21,7 @@ export function loadLog() {
 
 export function logInteraction(type, article) {
   const log = loadLog();
-  log.unshift({ id: article.story_id || article.id, type, topic: article.category || article.topic, ts: Date.now() });
+  log.unshift({ id: article.story_id || article.id, type, topic: article.category || article.topic, title: article.headline || article.title || '', ts: Date.now() });
   localStorage.setItem("margin_log", JSON.stringify(log.slice(0, 500)));
   window.dispatchEvent(new CustomEvent("margin:log"));
 }

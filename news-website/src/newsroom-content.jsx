@@ -1,10 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, Menu, Play, Headphones, Bookmark, ThumbsUp, ThumbsDown, Watch } from 'lucide-react';
 import { logInteraction, isBookmarked, saveBookmark, removeBookmark } from './engine.jsx';
 import { playVoice, stopVoice } from './newsroom-voice.jsx';
 import { recordInteraction } from './api.js';
 
-function ActionRow({ a, size = 14, hideListen = false }) {
+// ── Dwell tracking ────────────────────────────────────────────
+// 2 s visible at 50% → dwell_short   (quick glance, mild negative signal)
+// 6 s visible at 50% → dwell_long    (actual read, strong positive signal)
+function useDwell(a, rank) {
+  const elRef   = useRef(null);
+  const timerRef = useRef(null);
+  const sentRef  = useRef(null); // null | 'dwell_short' | 'dwell_long'
+
+  useEffect(() => {
+    sentRef.current = null; // reset when article changes
+  }, [a?.id]);
+
+  useEffect(() => {
+    const el = elRef.current;
+    if (!el || !a?.id) return;
+
+    const send = (action) => {
+      if (sentRef.current === 'dwell_long') return;
+      sentRef.current = action;
+      logInteraction(action, a);
+      const uid = localStorage.getItem("margin_uid");
+      const sid = localStorage.getItem("margin_sid");
+      if (uid && sid) recordInteraction(uid, sid, a.id, action, rank).catch(() => {});
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        timerRef.current = setTimeout(() => {
+          send('dwell_short');
+          timerRef.current = setTimeout(() => send('dwell_long'), 4000); // 2+4 = 6s total
+        }, 2000);
+      } else {
+        clearTimeout(timerRef.current);
+      }
+    }, { threshold: 0.5 });
+
+    observer.observe(el);
+    return () => { observer.disconnect(); clearTimeout(timerRef.current); };
+  }, [a?.id, rank]);
+
+  return elRef;
+}
+
+function ActionRow({ a, size = 14, hideListen = false, rank = 1 }) {
   const [act, setAct] = useState(() => ({
     like: false, dislike: false, listen: false,
     save: a ? isBookmarked(a.id) : false,
@@ -30,7 +73,7 @@ function ActionRow({ a, size = 14, hideListen = false }) {
         if (type === "dislike") actionStr = "skip";
         if (type === "save") actionStr = "share";
         if (type === "listen") actionStr = "dwell_long";
-        recordInteraction(uid, sid, a.id, actionStr, 1).catch(e => console.error(e));
+        recordInteraction(uid, sid, a.id, actionStr, rank).catch(e => console.error(e));
       }
     } else {
       if (type === "save") removeBookmark(a?.id);
@@ -230,8 +273,9 @@ export function NewsNav({ active, onChange, categories = [] }) {
 }
 
 // ── Hero top story (bound to top-ranked article) ─────────
-export function NewsHero({ a, match }) {
+export function NewsHero({ a, match, rank = 1 }) {
   const [hov, setHov] = useState(false);
+  const dwellRef = useDwell(a, rank);
   if (!a) return null;
 
   const handleArticleClick = () => {
@@ -241,7 +285,7 @@ export function NewsHero({ a, match }) {
   };
 
   return (
-    <article onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+    <article ref={dwellRef} onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ margin: "28px 0 18px", cursor: "pointer" }}>
       <div style={{ position: "relative", overflow: "hidden" }}>
         <div style={{
@@ -300,7 +344,7 @@ export function NewsHero({ a, match }) {
         <span>{a?.minutes} min read</span>
         
         <div style={{ marginLeft: 16 }}>
-          <ActionRow a={a} size={18} />
+          <ActionRow a={a} size={18} rank={rank} />
         </div>
 
         <span style={{ marginLeft: "auto", opacity: 0.7 }}>— Read the full dispatch</span>
@@ -337,8 +381,9 @@ export function NewsSection({ label, children, viewAll = true }) {
 }
 
 // ── Story card (clean, no geometric shapes) ─────────
-export function NewsCard({ a, variant = "compact", match }) {
+export function NewsCard({ a, variant = "compact", match, rank = 1 }) {
   const [hov, setHov] = useState(false);
+  const dwellRef = useDwell(a, rank);
   if (!a) return null;
   const pct = match ?? Math.round((a?.score || 0) * 100);
 
@@ -350,7 +395,7 @@ export function NewsCard({ a, variant = "compact", match }) {
 
   if (variant === "row") {
     return (
-      <article onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      <article ref={dwellRef} onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
         style={{
           display: "grid", gridTemplateColumns: "1fr 140px", gap: 16,
           padding: "14px 0", borderBottom: "1px solid rgba(0,0,0,0.1)",
@@ -363,7 +408,7 @@ export function NewsCard({ a, variant = "compact", match }) {
             display: "flex", justifyContent: "space-between", alignItems: "center"
           }}>
             <span>{a?.author} · {a?.minutes} min</span>
-            <ActionRow a={a} size={14} />
+            <ActionRow a={a} size={14} rank={rank} />
           </div>
           <h4 style={{
             margin: "0 0 8px", fontFamily: "'Playfair Display', serif",
@@ -380,7 +425,7 @@ export function NewsCard({ a, variant = "compact", match }) {
 
   if (variant === "large") {
     return (
-      <article onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      <article ref={dwellRef} onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
         style={{ cursor: "pointer" }}>
         <div style={{ overflow: "hidden", position: "relative" }}>
           <div style={{
@@ -403,7 +448,7 @@ export function NewsCard({ a, variant = "compact", match }) {
               <span>·</span>
               <span>{a?.author}</span>
             </div>
-            <ActionRow a={a} size={16} />
+            <ActionRow a={a} size={16} rank={rank} />
           </div>
           <h3 style={{
           margin: "8px 0 8px", fontFamily: "'Playfair Display', serif",
@@ -422,7 +467,7 @@ export function NewsCard({ a, variant = "compact", match }) {
 
   // compact
   return (
-    <article onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+    <article ref={dwellRef} onClick={handleArticleClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ cursor: "pointer" }}>
       <div style={{ overflow: "hidden", position: "relative" }}>
         <div style={{
@@ -447,7 +492,7 @@ export function NewsCard({ a, variant = "compact", match }) {
         display: "flex", justifyContent: "space-between", alignItems: "center"
       }}>
         <span>{a?.author} · {a?.minutes} min</span>
-        <ActionRow a={a} size={12} />
+        <ActionRow a={a} size={12} rank={rank} />
       </div>
     </article>
   );

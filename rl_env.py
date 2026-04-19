@@ -89,21 +89,35 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _mood_multipliers(articles: list, mood: dict) -> np.ndarray:
+    """Per-article scalar: 0.2 = deprioritize, 1.5 = boost, 1.0 = neutral."""
+    muls = np.ones(len(articles), dtype=np.float32)
+    for mood_key, val in mood.items():
+        if val > 0.6 and mood_key in MOOD_MODIFIERS:
+            mod = MOOD_MODIFIERS[mood_key]
+            for i, a in enumerate(articles):
+                if a.category in mod["deprioritize"]:
+                    muls[i] *= 0.2
+                if a.category in mod["boost"]:
+                    muls[i] *= 1.5
+    return muls
+
+
 def _candidate_pool(articles: list[Article], user_vec: np.ndarray,
                     embeddings: np.ndarray, archetype: str,
                     mood: dict) -> list[tuple[Article, int]]:
     """
     Returns (article, original_index) pairs, up to TOP_N_CANDIDATES.
     Cold start → category-weighted sample.
-    Warm       → cosine similarity on user_vec, then mood/freshness re-score.
+    Warm       → cosine similarity × mood multipliers, then freshness re-score.
     """
     is_cold = float(np.linalg.norm(user_vec)) < 1e-8
 
     if not is_cold:
-        # cosine similarity: embeddings are (N,768), user_vec is (768,)
         u = user_vec.astype(np.float32)
         u = u / (np.linalg.norm(u) + 1e-8)
         sims = embeddings @ u                     # (N,)
+        sims = sims * _mood_multipliers(articles, mood)   # apply mood
         top_idx = np.argpartition(sims, -TOP_N_CANDIDATES)[-TOP_N_CANDIDATES:]
         top_idx = top_idx[np.argsort(sims[top_idx])[::-1]]
         pairs = [(articles[i], int(i)) for i in top_idx]

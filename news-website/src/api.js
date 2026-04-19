@@ -5,11 +5,11 @@
 
 const API_BASE = '/api';
 
-export async function startSession(userId, mood, location = "Global", archetype = "cold_start") {
+export async function startSession(userId, mood, location = "Global", archetype = "cold_start", timestamp = null) {
   const res = await fetch(`${API_BASE}/session/start`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: userId, mood, location, archetype })
+    body: JSON.stringify({ user_id: userId, mood, location, archetype, timestamp })
   });
   if (!res.ok) throw new Error("Failed to start session");
   return await res.json();

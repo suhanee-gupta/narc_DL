@@ -129,11 +129,10 @@ export default function PersonalizationDrawer({ open, onClose, context, onSave, 
                 WebkitAppearance: "none", appearance: "none"
               }}
             >
-              <option value="Global">Global Perspective</option>
-              <option value="North America">North America</option>
-              <option value="Europe">Europe</option>
-              <option value="Asia-Pacific">Asia-Pacific</option>
-              <option value="Local Area">Local Area Focus</option>
+              <option value="Global">Global (no region bias)</option>
+              <option value="India">India</option>
+              <option value="US">United States</option>
+              <option value="UK">United Kingdom</option>
             </select>
           </DrawerField>
         </div>

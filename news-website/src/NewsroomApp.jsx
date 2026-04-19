@@ -57,8 +57,6 @@ export default function NewsroomApp() {
     setOnboarded(true);
   };
 
-  console.log("NewsroomApp rendering. drawerOpen=", drawerOpen);
-
   useEffect(() => {
     if (!onboarded) return;
     let isMounted = true;
@@ -66,8 +64,13 @@ export default function NewsroomApp() {
     async function loadFeed() {
       setReranking(true);
       try {
-        // 1. Start or update session
-        const sessRes = await startSession(userId, ctx.moodVector, ctx.region, ctx.profile);
+        // 1. Start or update session — map timeContext to a UTC hour so backend
+        //    derives the correct time bucket instead of using the real clock
+        const TIME_HOURS = { morning: 9, deepwork: 14, evening: 20 };
+        const tsDate = new Date();
+        tsDate.setUTCHours(TIME_HOURS[ctx.timeContext] ?? 14, 0, 0, 0);
+        const timestamp = tsDate.toISOString().replace('.000Z', 'Z');
+        const sessRes = await startSession(userId, ctx.moodVector, ctx.region, ctx.profile, timestamp);
         setSessionId(sessRes.session_id);
         localStorage.setItem("margin_sid", sessRes.session_id);
         
@@ -253,7 +256,7 @@ export default function NewsroomApp() {
         <main
           className={reranking ? "opacity-40 transition-opacity duration-500 pointer-events-none" : "transition-opacity duration-500"}
         >
-        {hero && <NewsHero a={hero} match={Math.round((hero?.score || 0) * 100)} />}
+        {hero && <NewsHero a={hero} match={Math.round((hero?.score || 0) * 100)} rank={1} />}
 
         {/* Latest */}
         <NewsSection label="Top Recommended">
@@ -261,10 +264,10 @@ export default function NewsroomApp() {
             display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: 40,
             animation: reranking ? "fadeIn 500ms ease" : "none",
           }}>
-            {gridA_large && <NewsCard a={gridA_large} variant="large" match={Math.round((gridA_large?.score || 0) * 100)} />}
+            {gridA_large && <NewsCard a={gridA_large} variant="large" match={Math.round((gridA_large?.score || 0) * 100)} rank={2} />}
             <div style={{ display: "flex", flexDirection: "column" }}>
-              {gridA_side.map(a => (
-                a && <NewsCard key={a.id} a={a} variant="row" match={Math.round((a?.score || 0) * 100)} />
+              {gridA_side.map((a, i) => (
+                a && <NewsCard key={a.id} a={a} variant="row" match={Math.round((a?.score || 0) * 100)} rank={3 + i} />
               ))}
             </div>
           </div>
@@ -273,8 +276,8 @@ export default function NewsroomApp() {
             marginTop: 34, paddingTop: 30, borderTop: "1px solid rgba(0,0,0,0.1)",
             animation: reranking ? "fadeIn 500ms ease" : "none",
           }}>
-            {gridB_compact.map(a => (
-              a && <NewsCard key={a.id} a={a} variant="compact" match={Math.round((a?.score || 0) * 100)} />
+            {gridB_compact.map((a, i) => (
+              a && <NewsCard key={a.id} a={a} variant="compact" match={Math.round((a?.score || 0) * 100)} rank={5 + i} />
             ))}
           </div>
         </NewsSection>
@@ -309,8 +312,8 @@ export default function NewsroomApp() {
             </article>
             )}
             <div style={{ display: "flex", flexDirection: "column" }}>
-              {gridC_side.map(a => (
-                a && <NewsCard key={a.id} a={a} variant="row" match={Math.round((a?.score || 0) * 100)} />
+              {gridC_side.map((a, i) => (
+                a && <NewsCard key={a.id} a={a} variant="row" match={Math.round((a?.score || 0) * 100)} rank={9 + i} />
               ))}
             </div>
           </div>
@@ -322,8 +325,8 @@ export default function NewsroomApp() {
             display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24,
             animation: reranking ? "fadeIn 500ms ease" : "none",
           }}>
-            {gridD_compact.map(a => (
-              a && <NewsCard key={a.id} a={a} variant="compact" match={Math.round((a?.score || 0) * 100)} />
+            {gridD_compact.map((a, i) => (
+              a && <NewsCard key={a.id} a={a} variant="compact" match={Math.round((a?.score || 0) * 100)} rank={12 + i} />
             ))}
           </div>
         </NewsSection>
