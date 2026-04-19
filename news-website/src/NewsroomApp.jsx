@@ -210,7 +210,19 @@ export default function NewsroomApp() {
           </div>
         </div>
 
-        {/* Hero */}
+        {reranking && ranked.length === 0 ? (
+          <div style={{ marginTop: 40, opacity: 0.6, animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite" }}>
+            <div style={{ height: 420, background: "rgba(0,0,0,0.04)", marginBottom: 40 }} />
+            <div style={{ display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: 40 }}>
+              <div style={{ height: 320, background: "rgba(0,0,0,0.04)" }} />
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                 <div style={{ height: 96, background: "rgba(0,0,0,0.04)" }} />
+                 <div style={{ height: 96, background: "rgba(0,0,0,0.04)" }} />
+                 <div style={{ height: 96, background: "rgba(0,0,0,0.04)" }} />
+              </div>
+            </div>
+          </div>
+        ) : (
         <main
           className={reranking ? "opacity-40 transition-opacity duration-500 pointer-events-none" : "transition-opacity duration-500"}
         >
@@ -293,6 +305,7 @@ export default function NewsroomApp() {
 
         <NewsFooter brand={BRAND} />
         </main>
+        )}
           </>
         )}
       </div>
